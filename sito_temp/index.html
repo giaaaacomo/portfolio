@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>giaaaacomo.portfolio</title>
+  <link rel="stylesheet" href="css.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      cursor: default;
+    }
+
+    .tit {
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const imageContainer = document.querySelector(".image");
+      const titles = document.querySelectorAll(".tit");
+
+      titles.forEach((title) => {
+        title.addEventListener("mouseover", function () {
+          const imageName = title.getAttribute("data-image");
+          const imageUrl = `templates/immagini/${imageName}`;
+          imageContainer.style.backgroundImage = `url("${imageUrl}")`;
+          imageContainer.style.display = "block";
+        });
+
+        title.addEventListener("mouseout", function () {
+          imageContainer.style.display = "none";
+        });
+      });
+    });
+
+    
+  </script>
+</head>
+
+<body>
+  <div class="contenitore">
+    <div class="cella" id="a1">GIACOMO ALBANI</div>
+    <div class="cella" id="a4">PORTFOLIO</div>
+    <div class="cella" id="a5">v4</div>
+    <div class="cella tit" id="d1" data-image="animitas.png">ARCAICO</div>
+    <div class="cella tit" id="d2" data-image="ab_aeterno.png">KHATARSIS</div>
+    <div class="cella tit" id="e1" data-image="arcaico.png">ARGO</div>
+    <div class="cella tit" id="e2" data-image="highness.png">CLUSTER</div>
+    <div class="cella tit" id="f1" data-image="invisivel.png">TIF</div>
+    <div class="cella tit" id="f2" data-image="limbo.png">ATTRAVERSO</div>
+    <div class="cella tit" id="g1" data-image="ma.png">ARcal</div>
+    <div class="cella tit" id="g2" data-image="malia.png">ABACEDARIO</div>
+    <div class="cella tit" id="h1" data-image="soglia.png">INSTABILE</div>
+    <div class="cella tit" id="h2" data-image="zenit.png"></div>
+    <div class="cella" id="k12">EVERYTHING</div>
+    <div class="cella" id="k45">INFO</div>
+  </div>
+  <div class="image"></div>
+  <div id="video-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none;"></div>
+</body>
+
+</html>
+
+
+<!-- © Giacomo Albani - @giaaaacomo -->

@@ -1,0 +1,177 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: black;
+  }
+  
+  .contenitore {
+    display: grid;
+    grid-template-columns: repeat(5, 20%);
+    grid-template-rows: repeat(11, 9.09%);
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .cella {
+    font-size: 18pt;
+    text-align: left;
+    padding-left: 30px;
+    padding-top: 30px;
+    font-weight: 300;
+    font-family: "Inter", sans-serif;
+    color: white;
+  }
+  
+  .tit {
+    font-size: 42.33pt;
+    font-weight: 300;
+    font-family: "Inter", sans-serif;
+    padding-top: 0%;
+  }
+  
+  .tit:hover {
+    color: #224dff;
+  }
+  
+  #a1 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  #a4 {
+    grid-column: 4;
+    grid-row: 1;
+  }
+  
+  #a5 {
+    grid-column: 5;
+    grid-row: 1;
+  }
+  
+  #d1 {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  
+  #d2 {
+    grid-column: 2 / 4;
+    grid-row: 4;
+  }
+  
+  #e1 {
+    grid-column: 1;
+    grid-row: 5;
+  }
+  
+  #e2 {
+    grid-column: 2;
+    grid-row: 5;
+  }
+  
+  #f1 {
+    grid-column: 1;
+    grid-row: 6;
+  }
+  
+  #f2 {
+    grid-column: 2;
+    grid-row: 6;
+  }
+  
+  #g1 {
+    grid-column: 1;
+    grid-row: 7;
+  }
+  
+  #g2 {
+    grid-column: 2;
+    grid-row: 7;
+  }
+  
+  #h1 {
+    grid-column: 1;
+    grid-row: 8;
+  }
+  
+  #h2 {
+    grid-column: 2;
+    grid-row: 8;
+  }
+  
+  #k12 {
+    grid-column: 1 / 3;
+    grid-row: 10;
+    padding-top: 70px;
+  }
+  
+  #k45 {
+    grid-column: 4 / 6;
+    grid-row: 10;
+    padding-top: 70px;
+  }
+  
+  .image {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 640px;
+    height: 360px;
+    background: url(templates/immagini/Mount.jpg) center/cover;
+    display: none;
+    z-index: 2; /* Imposta il livello dello z-index per l'immagine */
+  }
+  
+  /* Aggiunta per la mappatura delle immagini */
+  #d1:hover .image {
+    background-image: url(templates/immagini/animitas.jpg);
+    z-index: 1; /* Imposta il livello dello z-index per l'immagine durante l'hover */
+  }
+  
+  #d2:hover .image {
+    background-image: url(templates/immagini/ab_aeterna.jpg);
+    z-index: 1;
+  }
+  
+  #e1:hover .image {
+    background-image: url(templates/immagini/arcaico.jpg);
+    z-index: 1;
+  }
+  
+  #e2:hover .image {
+    background-image: url(templates/immagini/highness.jpg);
+    z-index: 1;
+  }
+  
+  #f1:hover .image {
+    background-image: url(templates/immagini/invisivel.jpg);
+    z-index: 1;
+  }
+  
+  #f2:hover .image {
+    background-image: url(templates/immagini/limbo.jpg);
+    z-index: 1;
+  }
+  
+  #g1:hover .image {
+    background-image: url(templates/immagini/ma.jpg);
+    z-index: 1;
+  }
+  
+  #g2:hover .image {
+    background-image: url(templates/immagini/malia.jpg);
+    z-index: 1;
+  }
+  
+  #h1:hover .image {
+    background-image: url(templates/immagini/soglia.jpg);
+    z-index: 1;
+  }
+  
+  #h2:hover .image {
+    background-image: url(templates/immagini/zenith.jpg);
+    z-index: 1;
+  }
+
+
+  /* © Giacomo Albani - @giaaaacomo */
