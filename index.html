@@ -19,25 +19,69 @@
     }
   </style>
   <script>
+    var arrText = { arcaico: 'The project and poetics of Eduardo Souto De Moura convey a perspective on matter and an aesthetics that define the way of perceiving space and time within it. <br>Souto de Moura "emerges in the international debate for his ability to grasp the cultural and historical dimension of the project" (Antonio Angelillo, director of ACMA).<br> This type of approach leads to an archetypal investigation, to a gaze between sacredness and antiquity that drags along an imaginary past.<br> The concepts of duality, geometry, and time thus allow for a new look at the project of the Portuguese architect collapsing into the macro-theme of the archaic. <br>Arcaico is situated in a time before time where space and matter coexist in potentiality and in act: in this indefinite temporality, everything coexists in a liquid, singular thing ruled by the dualism between entropy and imminence.', khatarsis: 'value2', argo: 'https://www.behance.net/gallery/174444517/ARGO-Archivio-del-Ghiaccio', cluster: 'value4', tif: 'value5', attraverso: 'value6', arcal: 'value7', abacedario: 'value8', instabile: 'value9', mendeleevar: 'value10' }
+    var imgName = { arcaico: 'arcaico0', khatarsis: 'khatarsis0-khatarsis1', argo: 'argo0-argo1-argo2', cluster: 'cluster0-cluster1-cluster2', tif: 'tif0-tif1-tif2', attraverso: 'attraverso0-attraverso1', arcal: 'arcal0-arcal1', abacedario: 'abacedario0-abacedario1-abacedario2', instabile: 'instabile0', mendeleevar: 'mendeleevar0' }
+
     document.addEventListener("DOMContentLoaded", function () {
       const imageContainer = document.querySelector(".image");
       const titles = document.querySelectorAll(".tit");
 
       titles.forEach((title) => {
-        title.addEventListener("mouseover", function () {
+        title.addEventListener("mouseenter", function () {
           const imageName = title.getAttribute("data-image");
           const imageUrl = `templates/immagini/${imageName}`;
           imageContainer.style.backgroundImage = `url("${imageUrl}")`;
           imageContainer.style.display = "block";
         });
 
-        title.addEventListener("mouseout", function () {
+        title.addEventListener("mouseleave", function () {
           imageContainer.style.display = "none";
         });
       });
+
+      titles.forEach((title) => {
+        title.addEventListener("click", function () {
+          document.getElementsByClassName("file")[0].style.display = "block";
+          var gg = "templates/immagini/" + title.innerHTML.toLocaleLowerCase() + "0.jpg";
+          document.getElementsByClassName("image-file")[0].style.backgroundImage = "url(\"" + gg + "\")";
+
+          //set title - gg
+          document.getElementsByClassName("title-file")[0].innerHTML = title.innerHTML;
+          document.getElementsByClassName("text-file")[0].innerHTML = arrText[title.innerHTML.toLocaleLowerCase()];
+
+        });
+      });
+
+      document.getElementsByClassName("file-close-svg")[0].addEventListener("click", function () { document.getElementsByClassName("file")[0].style.display = "none"; });
+
+      window.addEventListener('mouseup', function (event) {
+        var pol = document.getElementsByClassName("file")[0];
+        if (!(event.target.closest(".file"))) {
+          pol.style.display = 'none';
+        }
+      });
+
+      function changeImage() {
+        if (window.getComputedStyle(document.getElementsByClassName("file")[0]).display !== "none") {
+          var imgTmp = document.getElementsByClassName("image-file")[0].style.backgroundImage;
+          var imgIndex = ((imgName[document.getElementsByClassName("title-file")[0].innerHTML.toLocaleLowerCase()]).split('-')).length;
+
+          if (imgIndex > 1) {
+            if (parseInt(imgTmp.replace(/\D/g, "")) + 1 >= imgIndex) {
+              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + "0.jpg\")";
+            } else {
+              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + (parseInt(imgTmp.replace(/\D/g, "")) + 1) + ".jpg\")";
+            }
+          }
+
+          console.log(imgIndex);
+          console.log(imgTmp);
+        }
+      }
+      setInterval(changeImage, 5000); //ogni 5 secondi
     });
 
-    
+
   </script>
 </head>
 
@@ -46,21 +90,38 @@
     <div class="cella" id="a1">GIACOMO ALBANI</div>
     <div class="cella" id="a4">PORTFOLIO</div>
     <div class="cella" id="a5">v4</div>
-    <div class="cella tit" id="d1" data-image="animitas.png">ARCAICO</div>
-    <div class="cella tit" id="d2" data-image="ab_aeterno.png">KHATARSIS</div>
-    <div class="cella tit" id="e1" data-image="arcaico.png">ARGO</div>
-    <div class="cella tit" id="e2" data-image="highness.png">CLUSTER</div>
-    <div class="cella tit" id="f1" data-image="invisivel.png">TIF</div>
-    <div class="cella tit" id="f2" data-image="limbo.png">ATTRAVERSO</div>
-    <div class="cella tit" id="g1" data-image="ma.png">ARcal</div>
-    <div class="cella tit" id="g2" data-image="malia.png">ABACEDARIO</div>
-    <div class="cella tit" id="h1" data-image="soglia.png">INSTABILE</div>
-    <div class="cella tit" id="h2" data-image="zenit.png">MENDELEEVar</div>
-    <div class="cella" id="k12">EVERYTHING</div>
-    <div class="cella" id="k45">INFO</div>
+    <div class="cella tit" id="d1" data-image="arcaico0.jpg">ARCAICO</div>
+    <div class="cella tit" id="d2" data-image="khatarsis0.jpg">KHATARSIS</div>
+    <div class="cella tit" id="e1" data-image="argo0.jpg">ARGO</div>
+    <div class="cella tit" id="e2" data-image="cluster0.jpg">CLUSTER</div>
+    <div class="cella tit" id="f1" data-image="tif0.jpg">TIF</div>
+    <div class="cella tit" id="f2" data-image="attraverso0.jpg">ATTRAVERSO</div>
+    <div class="cella tit" id="g1" data-image="arcal0.jpg">ARcal</div>
+    <div class="cella tit" id="g2" data-image="abacedario0.jpg">ABACEDARIO</div>
+    <div class="cella tit" id="h1" data-image="instabile0.jpg">INSTABILE</div>
+    <div class="cella tit" id="h2" data-image="mendeleevar.jpg">MENDELEEVar</div>
+    <div class="cella" id="k12"><a href="google.com">EVERYTHING</a></div>
+    <div class="cella" id="k45"><a href="google.com">INFO</a></div>
   </div>
   <div class="image"></div>
-  <div id="video-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none;"></div>
+  <div class="file">
+    <div class="file-close">
+      <svg class="file-close-svg" xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px"
+        fill="var(--marker)">
+        <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+      </svg>
+    </div>
+    <div class="file-content">
+      <div class="file-content-div image-file">
+        <!-- <div class="image-file"></div> -->
+      </div>
+      <div class="file-content-div file-content-div-text">
+        <h1 class="title-file"></h1>
+        <div class="text-file"></div>
+      </div>
+    </div>
+  </div>
+  <!--   <div id="video-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none;"></div> -->
 </body>
 
 </html>
