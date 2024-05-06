@@ -47,7 +47,7 @@
       titles.forEach((title) => {
         title.addEventListener("click", function () {
           document.getElementsByClassName("file")[0].style.display = "block";
-          var gg = "templates/immagini/" + title.innerHTML.toLocaleLowerCase() + "0.jpg";
+          var gg = "templates/immagini/" + title.innerHTML.toLocaleLowerCase() + "0.webp";
           document.getElementsByClassName("image-file")[0].style.backgroundImage = "url(\"" + gg + "\")";
 
           //set title - gg
@@ -73,9 +73,9 @@
 
           if (imgIndex > 1) {
             if (parseInt(imgTmp.replace(/\D/g, "")) + 1 >= imgIndex) {
-              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + "0.jpg\")";
+              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + "0.webp\")";
             } else {
-              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + (parseInt(imgTmp.replace(/\D/g, "")) + 1) + ".jpg\")";
+              document.getElementsByClassName("image-file")[0].style.backgroundImage = imgTmp.substring(0, imgTmp.length - 7) + (parseInt(imgTmp.replace(/\D/g, "")) + 1) + ".webp\")";
             }
           }
 
@@ -95,16 +95,16 @@
     <div class="cella" id="a1"><a href="https://giaaaacomo.github.io/portfolio/">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a href="https://giaaaacomo.github.io/portfolio/">PORTFOLIO</a></div>
     <div class="cella" id="a5">v4</div>
-    <div class="cella tit" id="d1" data-image="arcaico0.jpg">ARCAICO</div>
-    <div class="cella tit" id="d2" data-image="khatarsis0.jpg">KHATARSIS</div>
-    <div class="cella tit" id="e1" data-image="argo0.jpg">ARGO</div>
-    <div class="cella tit" id="e2" data-image="cluster0.jpg">CLUSTER</div>
-    <div class="cella tit" id="f1" data-image="tif0.jpg">TIF</div>
-    <div class="cella tit" id="f2" data-image="attraverso0.jpg">ATTRAVERSO</div>
-    <div class="cella tit" id="g1" data-image="arcal0.jpg">ARcal</div>
-    <div class="cella tit" id="g2" data-image="abacedario0.jpg">ABACEDARIO</div>
-    <div class="cella tit" id="h1" data-image="instabile0.jpg">INSTABILE</div>
-    <div class="cella tit" id="h2" data-image="mendeleevar0.jpg">MENDELEEVar</div>
+    <div class="cella tit" id="d1" data-image="arcaico0.webp">ARCAICO</div>
+    <div class="cella tit" id="d2" data-image="khatarsis0.webp">KHATARSIS</div>
+    <div class="cella tit" id="e1" data-image="argo0.webp">ARGO</div>
+    <div class="cella tit" id="e2" data-image="cluster0.webp">CLUSTER</div>
+    <div class="cella tit" id="f1" data-image="tif0.webp">TIF</div>
+    <div class="cella tit" id="f2" data-image="attraverso0.webp">ATTRAVERSO</div>
+    <div class="cella tit" id="g1" data-image="arcal0.webp">ARcal</div>
+    <div class="cella tit" id="g2" data-image="abacedario0.webp">ABACEDARIO</div>
+    <div class="cella tit" id="h1" data-image="instabile0.webp">INSTABILE</div>
+    <div class="cella tit" id="h2" data-image="mendeleevar0.webp">MENDELEEVar</div>
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
   </div>
