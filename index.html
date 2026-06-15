@@ -27,26 +27,8 @@
 
     const imageFolder = "templates/immagini/";
 
-    function prefetchProjectImages() {
-      fetch(imageFolder)
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-          const imageLinks = Array.from(doc.querySelectorAll("a"))
-            .filter(link => link.href.endsWith(".webp"))
-            .map(link => link.href);
-
-          imageLinks.forEach(link => {
-            const prefetchLink = document.createElement("link");
-            prefetchLink.rel = "prefetch";
-            prefetchLink.href = link;
-            document.head.appendChild(prefetchLink);
-          });
-        })
-        .catch(error => {
-          console.error("Error fetching image folder:", error);
-        });
+    function getProjectImageUrl(imageName) {
+      return `${imageFolder}${imageName}`;
     }
 
 
@@ -113,23 +95,109 @@
       }
     };
 
+    const imagePreloadCache = new Map();
+
+    function preloadImage(imageName) {
+      if (imagePreloadCache.has(imageName)) {
+        return imagePreloadCache.get(imageName);
+      }
+
+      const imageUrl = getProjectImageUrl(imageName);
+      const image = new Image();
+      image.decoding = "async";
+
+      const preload = new Promise((resolve) => {
+        image.onload = function () {
+          resolve(true);
+        };
+        image.onerror = function () {
+          resolve(false);
+        };
+      });
+
+      image.src = imageUrl;
+      imagePreloadCache.set(imageName, preload);
+      return preload;
+    }
+
+    function preloadProjectImages(project) {
+      project.images.forEach(preloadImage);
+    }
+
+    function preloadAllProjectImages() {
+      const firstImages = Object.values(projects).map(project => project.images[0]);
+      const remainingImages = Object.values(projects).flatMap(project => project.images.slice(1));
+
+      firstImages.forEach(preloadImage);
+
+      const preloadRemainingImages = function () {
+        remainingImages.forEach(preloadImage);
+      };
+
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(preloadRemainingImages);
+      } else {
+        setTimeout(preloadRemainingImages, 500);
+      }
+    }
+
+    preloadAllProjectImages();
+
     document.addEventListener("DOMContentLoaded", function () {
       const imageContainer = document.querySelector(".image");
       const fileContainer = document.querySelector(".file");
       const fileImage = document.querySelector(".image-file");
+      const fileImageLayers = document.querySelectorAll(".file-image-layer");
       const fileTitle = document.querySelector(".title-file");
       const fileText = document.querySelector(".text-file");
       const fileClose = document.querySelector(".file-close-svg");
       const titles = document.querySelectorAll(".tit");
       let currentProject = null;
       let currentImageIndex = 0;
+      let activeImageLayerIndex = 0;
+      let slideshowRequestId = 0;
 
       function getProjectFromTitle(title) {
         return projects[title.dataset.project];
       }
 
-      function setProjectImage(project, imageIndex) {
-        fileImage.style.backgroundImage = `url("templates/immagini/${project.images[imageIndex]}")`;
+      function showProjectImage(project, imageIndex, instant = false) {
+        const imageUrl = getProjectImageUrl(project.images[imageIndex]);
+        const nextLayerIndex = instant ? activeImageLayerIndex : 1 - activeImageLayerIndex;
+        const nextLayer = fileImageLayers[nextLayerIndex];
+        const currentLayer = fileImageLayers[activeImageLayerIndex];
+
+        function revealImage() {
+          nextLayer.classList.add("is-visible");
+          if (nextLayer !== currentLayer) {
+            currentLayer.classList.remove("is-visible");
+          }
+          activeImageLayerIndex = nextLayerIndex;
+        }
+
+        nextLayer.src = imageUrl;
+
+        if (instant || nextLayer.complete) {
+          revealImage();
+          return Promise.resolve(true);
+        }
+
+        return new Promise((resolve) => {
+          nextLayer.onload = function () {
+            if (nextLayer.decode) {
+              nextLayer.decode().catch(() => null).then(() => {
+                revealImage();
+                resolve(true);
+              });
+            } else {
+              revealImage();
+              resolve(true);
+            }
+          };
+          nextLayer.onerror = function () {
+            resolve(false);
+          };
+        });
       }
 
       function showProjectPreview(title) {
@@ -138,7 +206,7 @@
           return;
         }
 
-        imageContainer.style.backgroundImage = `url("templates/immagini/${project.images[0]}")`;
+        imageContainer.style.backgroundImage = `url("${getProjectImageUrl(project.images[0])}")`;
         imageContainer.style.display = "block";
       }
 
@@ -154,16 +222,30 @@
 
         currentProject = project;
         currentImageIndex = 0;
-        fileContainer.style.display = "block";
-        setProjectImage(currentProject, currentImageIndex);
+        const requestId = slideshowRequestId + 1;
+        slideshowRequestId = requestId;
+        preloadProjectImages(currentProject);
 
         fileTitle.textContent = currentProject.title;
         fileText.innerHTML = currentProject.text;
+
+        preloadImage(currentProject.images[0]).then(() => {
+          if (currentProject !== project || slideshowRequestId !== requestId) {
+            return;
+          }
+
+          showProjectImage(currentProject, currentImageIndex, true).then(() => {
+            if (currentProject === project && slideshowRequestId === requestId) {
+              fileContainer.style.display = "block";
+            }
+          });
+        });
       }
 
       function closeProject() {
         fileContainer.style.display = "none";
         currentProject = null;
+        slideshowRequestId += 1;
       }
 
       titles.forEach((title) => {
@@ -189,11 +271,26 @@
           return;
         }
 
-        currentImageIndex = (currentImageIndex + 1) % currentProject.images.length;
-        setProjectImage(currentProject, currentImageIndex);
+        const project = currentProject;
+        const nextImageIndex = (currentImageIndex + 1) % project.images.length;
+        const requestId = slideshowRequestId + 1;
+        slideshowRequestId = requestId;
+
+        preloadImage(project.images[nextImageIndex]).then((loaded) => {
+          if (!loaded || currentProject !== project || slideshowRequestId !== requestId) {
+            return;
+          }
+
+          showProjectImage(project, nextImageIndex).then((shown) => {
+            if (!shown || currentProject !== project || slideshowRequestId !== requestId) {
+              return;
+            }
+
+            currentImageIndex = nextImageIndex;
+          });
+        });
       }
       setInterval(changeImage, 2500); //ogni 5 secondi
-      prefetchProjectImages();
     });
 
 
@@ -204,7 +301,7 @@
   <div class="contenitore">
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a href="index.html">PORTFOLIO</a></div>
-    <div class="cella" id="a5">v4</div>
+    <div class="cella" id="a5"><span class="version-label">v4</span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
     <div class="cella tit" id="d1" data-project="arcaico">ARCAICO</div>
     <div class="cella tit" id="d2" data-project="khatarsis">KHATARSIS</div>
     <div class="cella tit" id="e1" data-project="argo">ARGO</div>
@@ -217,6 +314,7 @@
     <div class="cella tit" id="h2" data-project="mendeleevar">MENDELEEVar</div>
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
+    <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>
   </div>
   <div class="image"></div>
   <div class="file">
@@ -228,7 +326,8 @@
     </div>
     <div class="file-content">
       <div class="file-content-div image-file">
-        <!-- <div class="image-file"></div> -->
+        <img class="file-image-layer is-visible" alt="">
+        <img class="file-image-layer" alt="">
       </div>
       <div class="file-content-div file-content-div-text">
         <h1 class="title-file"></h1>
