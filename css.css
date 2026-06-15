@@ -8,9 +8,14 @@ html {
   font-family: "Inter", sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background-color: black;
+  overflow-x: hidden;
 }
 
 a {
@@ -225,6 +230,198 @@ p {
 .responsive {
   width: 100%;
   height: auto;
+}
+
+@media (max-width: 1024px) {
+  .cella {
+    font-size: 16pt;
+    padding-left: 24px;
+    padding-top: 24px;
+  }
+
+  .tit {
+    font-size: 34pt;
+  }
+
+  .image {
+    width: 72vw;
+    height: 40.5vw;
+    max-width: 640px;
+    max-height: 360px;
+  }
+
+  .text-file {
+    font-size: large;
+    line-height: 1.28;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .image {
+    display: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .contenitore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: min-content;
+    align-content: start;
+    gap: 14px 12px;
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 22px 18px 96px;
+  }
+
+  #a1,
+  #a4,
+  #a5,
+  #d1,
+  #d2,
+  #e1,
+  #e2,
+  #f1,
+  #f2,
+  #g1,
+  #g2,
+  #h1,
+  #h2,
+  #k12,
+  #k45 {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .cella {
+    min-width: 0;
+    padding: 0;
+    font-size: 14pt;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  #a1 {
+    grid-column: 1 / -1;
+  }
+
+  #a5 {
+    text-align: right;
+  }
+
+  #d1.tit,
+  #d2.tit,
+  #e1.tit,
+  #e2.tit,
+  #f1.tit,
+  #f2.tit,
+  #g1.tit,
+  #g2.tit,
+  #h1.tit,
+  #h2.tit {
+    grid-column: 1 / -1;
+  }
+
+  #d1.tit {
+    margin-top: clamp(82px, 13vh, 128px);
+  }
+
+  #d2:not(.tit) {
+    grid-column: 1 / -1;
+  }
+
+  #k12,
+  #k45 {
+    position: absolute;
+    bottom: calc(34px + env(safe-area-inset-bottom));
+    padding-top: 0;
+    width: calc((100% - 48px) / 2);
+  }
+
+  #k12 {
+    left: 18px;
+  }
+
+  #k45 {
+    left: calc(50% + 6px);
+  }
+
+  .tit {
+    font-size: 38px;
+    line-height: 0.96;
+  }
+
+  h1 {
+    font-size: 38px;
+    line-height: 0.96;
+  }
+
+  .file {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .file-close {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 20;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+  }
+
+  .file-close-svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .file-content {
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .file-content-div {
+    flex: none;
+  }
+
+  .image-file {
+    width: 100%;
+    height: 56vh;
+    height: 56dvh;
+    min-height: 240px;
+  }
+
+  .file-content-div-text {
+    height: auto;
+    min-height: 44vh;
+    min-height: 44dvh;
+    margin: 0;
+    padding: 20px 18px calc(34px + env(safe-area-inset-bottom));
+    justify-content: flex-start;
+    gap: 24px;
+  }
+
+  .file-content-div-text h1 {
+    margin: 0;
+  }
+
+  .text-file {
+    font-size: 18px;
+    line-height: 1.34;
+  }
 }
 
 /*robe per invertire i colori
