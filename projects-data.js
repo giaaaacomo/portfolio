@@ -8,12 +8,14 @@ window.projectsData = [
     year: 2025,
     featured: true,
     important: true,
-    category: "TOOLSET",
+    category: "TOOLSET, XR",
     client: "MA Thesis Project",
     images: ["arcaico0.webp"],
-    text: `The project and poetics of Eduardo Souto de Moura convey a perspective on matter and aesthetics that shape the perception of space and time, blending sacredness and antiquity to evoke an imaginary past. <br>"Arcaico" is situated in a time before time, where space and matter coexist in potentiality and in act, everything merging into a liquid, singular entity governed by the dualism of entropy and imminence. This project was made for Fondazione Cini, that hosted the Vatican Pavilion for the Architecture Biennale of Venice.`,
+    text: `ChroNotes is a design-driven toolset developed to manage the evolution and construction of knowledge within industrial spatial computing environments. Conceived as a technical and conceptual extension of the PROXIMA framework, the project introduces a vital temporal dimension to virtual data through chronoreferenced information.
+The core of the research focused on designing a visual interface that aligns with human mental models. Grounded in Cognitive Fit Theory, the system utilizes visual metaphors such as spatio-temporal stacking and "exploded views" to organize "atomic" notes—the minimal units of content—as they stratify and version over time. A primary objective of this study was the implementation of natural hand-tracking interactions. By analyzing micro-interactions like the "pinch" and "wrist rotation," the design aims to reduce cognitive load and improve accessibility for operators, removing the need for physical controllers in complex industrial tasks.
+Operating across a multimodal ecosystem (VR, AR, and Desktop), ChroNotes integrates AI-driven curation to gather data from linked machinery. The system provides automated summaries and identifies "breaking changes" or outdated content, ensuring information integrity. Ultimately, the project transforms static spatial instructions into a dynamic, stratified knowledge base tailored for the evolving requirements of Industry 5.0.`,
     links: [
-      { label: "VIMEO", href: "" }
+      { label: "link", href: "", wip: true }
     ]
   },
   {
@@ -22,12 +24,12 @@ window.projectsData = [
     year: 2026,
     featured: true,
     important: false,
-    category: "TOOL",
+    category: "GNOME TOOL",
     client: "PERSONAL",
     images: ["arcaico0.webp"],
-    text: `The project and poetics of Eduardo Souto de Moura convey a perspective on matter and aesthetics that shape the perception of space and time, blending sacredness and antiquity to evoke an imaginary past. <br>"Arcaico" is situated in a time before time, where space and matter coexist in potentiality and in act, everything merging into a liquid, singular entity governed by the dualism of entropy and imminence. This project was made for Fondazione Cini, that hosted the Vatican Pavilion for the Architecture Biennale of Venice.`,
+    text: `TW++, or Task Widget++ is a GNOME extension forked from the original <a href="https://gitlab.com/jmiskinis/gnome-shell-extension-task-widget">Task Widget</a>, now deprecated, that inherites from its original base the ability to show tasks from online providers in the date panel as a widget. On top of that TW++ adds two main features: M365 fetching, and task input. It is now possibile to add new tasks directly from the UI, edit, star, delete them and add due dates. Every part of the widget is though to perfecly integrate with the GNOME interfaces, and follows HIG standards. Great effort has been taken to totally revamp interactions to enable the new features.`,
     links: [
-      { label: "VIMEO", href: "" }
+      { label: "GITLAB", href: "https://gitlab.com/giaaaacomo/task-widget-plusplus", wip: false }
     ]
   },
   {
@@ -41,7 +43,7 @@ window.projectsData = [
     images: ["arcaico0.webp"],
     text: `The project and poetics of Eduardo Souto de Moura convey a perspective on matter and aesthetics that shape the perception of space and time, blending sacredness and antiquity to evoke an imaginary past. <br>"Arcaico" is situated in a time before time, where space and matter coexist in potentiality and in act, everything merging into a liquid, singular entity governed by the dualism of entropy and imminence. This project was made for Fondazione Cini, that hosted the Vatican Pavilion for the Architecture Biennale of Venice.`,
     links: [
-      { label: "VIMEO", href: "" }
+      { label: "VIMEO", href: "", wip: true }
     ]
   },
   {
@@ -55,7 +57,7 @@ window.projectsData = [
     images: ["khatarsis0.webp", "khatarsis1.webp", "khatarsis2.webp", "khatarsis3.webp", "khatarsis4.webp", "khatarsis5.webp", "khatarsis6.webp", "khatarsis7.webp", "khatarsis8.webp", "khatarsis9.webp"],
     text: `Khatarsis is an immersive experience designed for the former psychiatric hospital San Benedetto, in Pesaro. The entire experience develops inside the garden and is mainly divided into 3 parts: The trap, the touchpoints and the sonosphere. In short, it is an open-air museum, which can be visited and enjoyed by everyone, made up of stories, sounds and lights.`,
     links: [
-      { label: "BEHANCE", href: "https://www.behance.net/gallery/182835117/Immersive-Experience-in-a-former-psychiatric-hospital" }
+      { label: "BEHANCE", href: "https://www.behance.net/gallery/182835117/Immersive-Experience-in-a-former-psychiatric-hospital", wip: false }
     ]
   },
   {
@@ -69,7 +71,7 @@ window.projectsData = [
     images: ["argo0.webp", "argo1.webp", "argo2.webp"],
     text: `ARGO - Archivio del ghiaccio is a hypothetical museum located in Trento, for which I -in collaboration with <a href="https://www.behance.net/giuliomazz3ca1" target="_blank">Giulio Mazzanti Dolci</a>- developed the visual and motion identity. It consists of animated logos (three variants), animated type and visuals, social media identity, printed communication and a launch trailer. Since the museum is all about ice, and the various aspects related to it (both cultural, scientific, anthropological), the concept behind the whole project is to use the phisical and visual charateristics of ice: diaphanousity, stratification, floating. The whole structure is based thus on the stratification of different layers of visual elements, animated followind the movement of the ice floating atop the ocean.`,
     links: [
-      { label: "BEHANCE", href: "https://www.behance.net/gallery/174444517/ARGO-Archivio-del-Ghiaccio" }
+      { label: "BEHANCE", href: "https://www.behance.net/gallery/174444517/ARGO-Archivio-del-Ghiaccio", wip: false }
     ]
   },
   {
@@ -83,7 +85,7 @@ window.projectsData = [
     images: ["cluster0.webp", "cluster1.webp", "cluster2.webp"],
     text: `Cluster is an interactive installation that evokes the imagery of the cosmos and astrophysics: many tiny luminous particles present in a dark environment react to user interaction, moving in a space where gravity is controlled by the position and gestures of the hands. Through simple movements, users establish and manipulate a center of gravity, which, like a black hole, attracts all the particles, creating an accretion disk.`,
     links: [
-      { label: "VIMEO COMING SOON", href: "" }
+      { label: "VIMEO", href: "", wip: true }
     ]
   },
   {
@@ -97,7 +99,7 @@ window.projectsData = [
     images: ["tif0.webp", "tif1.webp", "tif2.webp", "tif3.webp", "tif4.webp"],
     text: `Designed for TIF, Tipoteca Italiana Fondazione, "La Danza dei caratteri" is an experience conceived to connect visitors with the exhibition space and to facilitate the fruition of a part of its heritage that is difficult to access: the typefaces. This is achieved by developing a direct relationship between humans and their presence in the space, that interacts with them in an organic and discreet manner.`,
     links: [
-      { label: "BEHANCE", href: "https://www.behance.net/gallery/193305765/La-Danza-dei-Caratteri-Interaction-experience" }
+      { label: "BEHANCE", href: "https://www.behance.net/gallery/193305765/La-Danza-dei-Caratteri-Interaction-experience", wip: false }
     ]
   },
   {
@@ -111,7 +113,7 @@ window.projectsData = [
     images: ["attraverso0.webp", "attraverso1.webp", "attraverso2.webp", "attraverso3.webp", "attraverso4.webp", "attraverso5.webp", "attraverso6.webp", "attraverso7.webp", "attraverso8.webp"],
     text: `Attraverso is my bachelor final thesis, that investigates the experience of space in the virtual and the experience of virtuality in space, concerning new media studies and theory, philosophy, neurosciences, and cultural aspects. For the thesis i also designed the visual and layouts, inspired by the many nineties-era books and research that started my journey, mixed with contemporary graphics.`,
     links: [
-      { label: "BEHANCE COMING SOON", href: "" }
+      { label: "BEHANCE", href: "", wip: true }
     ]
   },
   {
@@ -124,7 +126,9 @@ window.projectsData = [
     client: "BA Thesis project",
     images: ["arcal0.webp", "arcal1.webp"],
     text: `ARcal is an AR calendar that syncs in real-time with google calendar. The main idea was to join digital and phisical world&#39s tools allowing to get the digital ubiquity and synchronicity into those items that have a real collocation, that depends on daily spaces and the presence beneath them. ARcal is thought as a versatile application, that could be used with any calendar, but for the actual prototype it&#39s designed to recognise specific patterns on the page of a specific calendar. This allows the correct page recognition, so that the right month is displayed above the right page.`,
-    links: []
+    links: [
+      { label: "GitHub", href: "https://github.com/giaaaacomo/ARcal", wip: false }
+    ]
   },
   {
     slug: "abacedario",
@@ -149,7 +153,7 @@ window.projectsData = [
     images: ["instabile0.webp"],
     text: `For the 2017 final exposition of the school of sculpture at the Academy of Fine Arts in Urbino, i designed -in collaboration with Lorenzo Lembo- a poster and a catalogue that were inspired by the phisical peculiarities of the expositive space, and explored the concept of instability. The poster replicates the way in which the caption of the art pieces were displayed, while the catalogue presents a constant variation of the layout elements.`,
     links: [
-      { label: "CATALOGUE", href: "https://issuu.com/giancarlolepore/docs/catalogo-instabilefin" }
+      { label: "CATALOGUE", href: "https://issuu.com/giancarlolepore/docs/catalogo-instabilefin", wip: false }
     ]
   },
   {
@@ -163,7 +167,7 @@ window.projectsData = [
     images: ["mendeleevar0.webp", "mendeleevar1.webp", "mendeleevar2.webp"],
     text: `MendeleevAR is an AR version of Mendeleev&#39s table of elements. It recognizes every symbol as a marker, and displays on top of it the animated model of the atom; under that a small chart that reports every atom&#39s informations, like group, atomic weight, electron configuration. <br>It has also been developed a memory-like game, made of a deck of markers.`,
     links: [
-      { label: "CHECK IT OUT (SOON)", href: "" }
+      { label: "GitHub", href: "", wip: true }
     ]
   }
 ];
@@ -221,7 +225,8 @@ window.projectUtils = (function () {
       .filter((link) => link && typeof link.label === "string" && link.label.trim() !== "")
       .map((link) => ({
         label: link.label.trim(),
-        href: typeof link.href === "string" ? link.href.trim() : ""
+        href: typeof link.href === "string" ? link.href.trim() : "",
+        wip: link.wip === true
       }));
   }
 
@@ -260,6 +265,10 @@ window.projectUtils = (function () {
         project.links.forEach((link, linkIndex) => {
           if (!link || typeof link.label !== "string" || link.label.trim() === "") {
             console.error(`Invalid link label for project "${project.slug}" at index ${linkIndex}.`);
+          }
+
+          if (link && link.wip !== undefined && typeof link.wip !== "boolean") {
+            console.error(`Invalid link wip flag for project "${project.slug}" at index ${linkIndex}: expected a boolean.`);
           }
         });
       }

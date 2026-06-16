@@ -256,7 +256,22 @@
             projectLinks.forEach((link) => {
               const archiveLink = link.href ? document.createElement("a") : document.createElement("span");
               archiveLink.className = "archive-case-study external-link";
-              archiveLink.textContent = link.label;
+
+              if (link.wip) {
+                archiveLink.classList.add("is-wip");
+              }
+
+              const archiveLinkLabel = document.createElement("span");
+              archiveLinkLabel.className = "external-link-label";
+              archiveLinkLabel.textContent = link.label;
+              archiveLink.appendChild(archiveLinkLabel);
+
+              if (link.wip) {
+                const archiveWipLabel = document.createElement("span");
+                archiveWipLabel.className = "external-link-wip";
+                archiveWipLabel.textContent = "(WIP)";
+                archiveLink.appendChild(archiveWipLabel);
+              }
 
               if (link.href) {
                 archiveLink.href = link.href;
@@ -285,7 +300,22 @@
                 projectLinks.forEach((link) => {
                   const metaCaseStudy = link.href ? document.createElement("a") : document.createElement("span");
                   metaCaseStudy.className = "archive-meta-case-study external-link";
-                  metaCaseStudy.textContent = link.label;
+
+                  if (link.wip) {
+                    metaCaseStudy.classList.add("is-wip");
+                  }
+
+                  const metaLinkLabel = document.createElement("span");
+                  metaLinkLabel.className = "external-link-label";
+                  metaLinkLabel.textContent = link.label;
+                  metaCaseStudy.appendChild(metaLinkLabel);
+
+                  if (link.wip) {
+                    const metaWipLabel = document.createElement("span");
+                    metaWipLabel.className = "external-link-wip";
+                    metaWipLabel.textContent = "(WIP)";
+                    metaCaseStudy.appendChild(metaWipLabel);
+                  }
 
                   if (link.href) {
                     metaCaseStudy.href = link.href;

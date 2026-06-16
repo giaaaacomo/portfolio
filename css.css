@@ -36,6 +36,33 @@ a[target="_blank"]::after,
   content: " \2197";
 }
 
+.external-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+}
+
+.external-link.is-wip {
+  opacity: 0.55;
+}
+
+.external-link.is-wip::after {
+  content: "";
+}
+
+.external-link.is-wip .external-link-label {
+  text-decoration: line-through;
+}
+
+.external-link.is-wip .external-link-label::after {
+  content: " \2197";
+  text-decoration: line-through;
+}
+
+.external-link-wip {
+  text-decoration: none;
+}
+
 .active-page-link {
   color: var(--marker);
   text-shadow: var(--marker-glow);
@@ -592,6 +619,11 @@ p {
   color: black;
 }
 
+.file-content-div-text.has-no-project-links .file-project-meta.has-project-meta {
+  margin-top: auto;
+  padding-top: 40px;
+}
+
 .file-project-meta-entry {
   display: flex;
   gap: 8px;
@@ -1081,6 +1113,11 @@ p {
     font-size: 16px;
     gap: 2px;
     opacity: 0.42;
+  }
+
+  .file-content-div-text.has-no-project-links .file-project-meta.has-project-meta {
+    margin-top: -12px;
+    padding-top: 0;
   }
 
   .file-project-meta-entry {

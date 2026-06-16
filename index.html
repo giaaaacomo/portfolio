@@ -148,16 +148,35 @@
       function syncProjectFooterLink(project) {
         fileFooterLink.innerHTML = "";
         fileFooterLink.classList.remove("has-footer-content");
+        fileContentText.classList.remove("has-project-links", "has-no-project-links");
 
         const projectLinks = window.projectUtils.getProjectLinks(project);
         if (projectLinks.length === 0) {
+          fileContentText.classList.add("has-no-project-links");
           return;
         }
+
+        fileContentText.classList.add("has-project-links");
 
         projectLinks.forEach((link) => {
           const linkElement = link.href ? document.createElement("a") : document.createElement("span");
           linkElement.className = "file-footer-anchor external-link";
-          linkElement.textContent = link.label;
+
+          if (link.wip) {
+            linkElement.classList.add("is-wip");
+          }
+
+          const linkLabel = document.createElement("span");
+          linkLabel.className = "external-link-label";
+          linkLabel.textContent = link.label;
+          linkElement.appendChild(linkLabel);
+
+          if (link.wip) {
+            const wipLabel = document.createElement("span");
+            wipLabel.className = "external-link-wip";
+            wipLabel.textContent = "(WIP)";
+            linkElement.appendChild(wipLabel);
+          }
 
           if (link.href) {
             linkElement.href = link.href;
