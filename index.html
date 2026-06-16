@@ -110,6 +110,8 @@
       const fileImageLayers = document.querySelectorAll(".file-image-layer");
       const fileTitle = document.querySelector(".title-file");
       const fileText = document.querySelector(".text-file");
+      const fileContent = document.querySelector(".file-content");
+      const fileContentText = document.querySelector(".file-content-div-text");
       const fileProjectMeta = document.querySelector(".file-project-meta");
       const fileFooterLink = document.querySelector(".file-footer-link");
       const fileClose = document.querySelector(".file-close-svg");
@@ -118,59 +120,57 @@
       let activeImageLayerIndex = 0;
       let slideshowRequestId = 0;
 
-      function syncProjectFooterLink() {
+      function resetProjectScroll() {
+        [fileContainer, fileContent, fileContentText, fileText].forEach((element) => {
+          if (!element) {
+            return;
+          }
+
+          element.scrollTop = 0;
+          element.scrollLeft = 0;
+
+          if (typeof element.scrollTo === "function") {
+            element.scrollTo(0, 0);
+          }
+        });
+      }
+
+      function resetProjectScrollAfterLayout() {
+        resetProjectScroll();
+        window.requestAnimationFrame(() => {
+          resetProjectScroll();
+          window.requestAnimationFrame(resetProjectScroll);
+        });
+        window.setTimeout(resetProjectScroll, 0);
+        window.setTimeout(resetProjectScroll, 80);
+      }
+
+      function syncProjectFooterLink(project) {
         fileFooterLink.innerHTML = "";
         fileFooterLink.classList.remove("has-footer-content");
 
-        const childNodes = Array.from(fileText.childNodes);
-        let lastMeaningfulNode = null;
-
-        for (let index = childNodes.length - 1; index >= 0; index -= 1) {
-          const node = childNodes[index];
-
-          if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === "") {
-            continue;
-          }
-
-          if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "BR") {
-            continue;
-          }
-
-          lastMeaningfulNode = node;
-          break;
-        }
-
-        if (lastMeaningfulNode instanceof HTMLAnchorElement) {
-          while (lastMeaningfulNode.previousSibling) {
-            const previousNode = lastMeaningfulNode.previousSibling;
-
-            if (previousNode.nodeType === Node.TEXT_NODE && previousNode.textContent.trim() === "") {
-              previousNode.remove();
-              continue;
-            }
-
-            if (previousNode.nodeType === Node.ELEMENT_NODE && previousNode.tagName === "BR") {
-              previousNode.remove();
-              continue;
-            }
-
-            break;
-          }
-
-          lastMeaningfulNode.classList.add("file-footer-anchor");
-          fileFooterLink.appendChild(lastMeaningfulNode);
-          fileFooterLink.classList.add("has-footer-content");
+        const projectLinks = window.projectUtils.getProjectLinks(project);
+        if (projectLinks.length === 0) {
           return;
         }
 
-        if (lastMeaningfulNode.nodeType === Node.TEXT_NODE && lastMeaningfulNode.textContent.trim() !== "") {
-          const footerLabel = document.createElement("span");
-          footerLabel.className = "file-footer-anchor file-footer-label";
-          footerLabel.textContent = lastMeaningfulNode.textContent.trim();
-          lastMeaningfulNode.remove();
-          fileFooterLink.appendChild(footerLabel);
-          fileFooterLink.classList.add("has-footer-content");
-        }
+        projectLinks.forEach((link) => {
+          const linkElement = link.href ? document.createElement("a") : document.createElement("span");
+          linkElement.className = "file-footer-anchor external-link";
+          linkElement.textContent = link.label;
+
+          if (link.href) {
+            linkElement.href = link.href;
+            linkElement.target = "_blank";
+            linkElement.rel = "noreferrer";
+          } else {
+            linkElement.classList.add("file-footer-label");
+          }
+
+          fileFooterLink.appendChild(linkElement);
+        });
+
+        fileFooterLink.classList.add("has-footer-content");
       }
 
       function syncProjectMeta(project) {
@@ -340,7 +340,8 @@
         fileTitle.textContent = currentProject.title;
         fileText.innerHTML = currentProject.text;
         syncProjectMeta(currentProject);
-        syncProjectFooterLink();
+        syncProjectFooterLink(currentProject);
+        resetProjectScrollAfterLayout();
 
         preloadImage(currentProject.images[0]).then(() => {
           if (currentProject !== project || slideshowRequestId !== requestId) {
@@ -351,6 +352,7 @@
             if (currentProject === project && slideshowRequestId === requestId) {
               document.body.classList.add("is-project-open");
               fileContainer.style.display = "block";
+              resetProjectScrollAfterLayout();
             }
           });
         });
@@ -358,6 +360,7 @@
 
       function closeProject() {
         fileContainer.style.display = "none";
+        resetProjectScrollAfterLayout();
         currentProject = null;
         slideshowRequestId += 1;
         document.body.classList.remove("is-project-open");
@@ -426,7 +429,7 @@
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a class="active-page-link" href="index.html" aria-current="page">PORTFOLIO</a></div>
     <div class="cella" id="a5"><span class="version-control version-label"><button class="version-button" type="button">v5</button><span class="version-burst" aria-hidden="true">✨</span></span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
-    <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
+    <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo" target="_blank" rel="noreferrer">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
     <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>
   </div>

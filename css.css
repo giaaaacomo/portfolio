@@ -31,6 +31,11 @@ a:hover {
   text-shadow: var(--marker-glow);
 }
 
+a[target="_blank"]::after,
+.external-link::after {
+  content: " \2197";
+}
+
 .active-page-link {
   color: var(--marker);
   text-shadow: var(--marker-glow);
@@ -306,6 +311,11 @@ p {
   background: transparent;
   color: white;
   font: inherit;
+  display: grid;
+  grid-template-columns: 1ch auto;
+  column-gap: 0.45em;
+  align-items: baseline;
+  justify-content: start;
   text-align: left;
   text-transform: uppercase;
   grid-column: 1;
@@ -336,7 +346,13 @@ p {
 }
 
 .archive-title::before {
-  content: "+ ";
+  content: "+";
+  grid-column: 1;
+  justify-self: center;
+}
+
+.archive-item.is-open .archive-title::before {
+  content: "-";
 }
 
 .archive-category,
@@ -424,17 +440,24 @@ p {
   object-fit: cover;
 }
 
-.archive-case-study {
+.archive-links {
   display: none;
   grid-column: 5;
   align-self: start;
   padding-left: 30px;
   font-size: 14px;
   text-transform: uppercase;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.archive-item.is-open .archive-case-study {
-  display: inline-block;
+.archive-case-study {
+  color: white;
+  text-shadow: none;
+}
+
+.archive-item.is-open .archive-links:not(:empty) {
+  display: flex;
 }
 
 .archive-lightbox {
@@ -484,6 +507,12 @@ p {
   height: 85vh;
   display: none;
   font-family: "Inter", sans-serif;
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+}
+
+.home-page.is-project-open {
+  overflow: hidden;
 }
 
 .file-close {
@@ -505,6 +534,7 @@ p {
   height: max-content;
   color: black;
   height: inherit;
+  overflow-anchor: none;
 }
 
 .file-content-div {
@@ -579,7 +609,9 @@ p {
 
 .file-footer-link {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   order: 1;
   margin-top: auto;
   padding-top: 40px;
@@ -869,7 +901,7 @@ p {
 
   .archive-head,
   .archive-detail-media,
-  .archive-case-study {
+  .archive-links {
     display: none !important;
   }
 
@@ -883,7 +915,7 @@ p {
 
   .archive-title {
     width: 100%;
-    display: block;
+    display: grid;
     padding-left: 0;
   }
 
@@ -919,7 +951,10 @@ p {
     text-transform: uppercase;
   }
 
-  .archive-meta-case-study {
+  .archive-meta-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     margin-left: auto;
   }
 
@@ -1041,7 +1076,7 @@ p {
     order: 2;
     flex-direction: column;
     align-items: flex-start;
-    margin-top: -2px;
+    margin-top: -12px;
     padding-top: 0;
     font-size: 16px;
     gap: 2px;

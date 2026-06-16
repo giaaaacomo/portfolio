@@ -230,6 +230,8 @@
             body.className = "archive-body";
             body.innerHTML = project.text || "";
 
+            const projectLinks = window.projectUtils.getProjectLinks(project);
+
             const mediaPrimary = document.createElement("button");
             mediaPrimary.className = "archive-detail-media";
             mediaPrimary.type = "button";
@@ -248,12 +250,22 @@
             mediaSecondaryImage.alt = "";
             mediaSecondary.appendChild(mediaSecondaryImage);
 
-            const caseStudy = document.createElement("a");
-            caseStudy.className = "archive-case-study";
-            caseStudy.href = project.caseStudyUrl || "https://example.com";
-            caseStudy.target = "_blank";
-            caseStudy.rel = "noreferrer";
-            caseStudy.textContent = "CASE STUDY";
+            const archiveLinks = document.createElement("div");
+            archiveLinks.className = "archive-links";
+
+            projectLinks.forEach((link) => {
+              const archiveLink = link.href ? document.createElement("a") : document.createElement("span");
+              archiveLink.className = "archive-case-study external-link";
+              archiveLink.textContent = link.label;
+
+              if (link.href) {
+                archiveLink.href = link.href;
+                archiveLink.target = "_blank";
+                archiveLink.rel = "noreferrer";
+              }
+
+              archiveLinks.appendChild(archiveLink);
+            });
 
             const metaValues = [project.category, project.client, project.year].filter(Boolean);
             if (metaValues.length > 0) {
@@ -266,13 +278,26 @@
                 meta.appendChild(metaItem);
               });
 
-              const metaCaseStudy = document.createElement("a");
-              metaCaseStudy.className = "archive-meta-case-study";
-              metaCaseStudy.href = project.caseStudyUrl || "https://example.com";
-              metaCaseStudy.target = "_blank";
-              metaCaseStudy.rel = "noreferrer";
-              metaCaseStudy.textContent = "CASE STUDY ↗";
-              meta.appendChild(metaCaseStudy);
+              if (projectLinks.length > 0) {
+                const metaLinks = document.createElement("div");
+                metaLinks.className = "archive-meta-links";
+
+                projectLinks.forEach((link) => {
+                  const metaCaseStudy = link.href ? document.createElement("a") : document.createElement("span");
+                  metaCaseStudy.className = "archive-meta-case-study external-link";
+                  metaCaseStudy.textContent = link.label;
+
+                  if (link.href) {
+                    metaCaseStudy.href = link.href;
+                    metaCaseStudy.target = "_blank";
+                    metaCaseStudy.rel = "noreferrer";
+                  }
+
+                  metaLinks.appendChild(metaCaseStudy);
+                });
+
+                meta.appendChild(metaLinks);
+              }
 
               body.appendChild(meta);
             }
@@ -313,7 +338,7 @@
             }
 
             item.dataset.project = project.slug;
-            item.append(title, category, client, year, body, mediaPrimary, mediaSecondary, caseStudy);
+            item.append(title, category, client, year, body, mediaPrimary, mediaSecondary, archiveLinks);
             archiveList.appendChild(item);
           });
       }
@@ -321,19 +346,25 @@
       renderArchiveList();
 
       document.querySelectorAll(".archive-item").forEach((item) => {
-        item.addEventListener("click", function (event) {
-          if (event.target.closest(".archive-detail-media, .archive-case-study, .archive-body, .archive-mobile-carousel-button")) {
-            return;
-          }
-
-          toggleArchiveItem(item);
-        });
         item.addEventListener("mouseenter", function () {
           item.classList.add("is-hovered");
         });
         item.addEventListener("mouseleave", function () {
           item.classList.remove("is-hovered");
         });
+      });
+
+      archiveList.addEventListener("click", function (event) {
+        if (event.target.closest(".archive-detail-media, .archive-case-study, .archive-body, .archive-mobile-carousel-button")) {
+          return;
+        }
+
+        const item = event.target.closest(".archive-item");
+        if (!item || !archiveList.contains(item)) {
+          return;
+        }
+
+        toggleArchiveItem(item);
       });
 
       document.querySelectorAll(".archive-detail-media").forEach((media) => {
@@ -379,7 +410,7 @@
 
     <main class="archive-list" aria-label="Archive"></main>
 
-    <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
+    <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo" target="_blank" rel="noreferrer">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
     <div class="cella" id="k5"><a class="active-page-link" href="archive.html" aria-current="page">ARCHIVE</a></div>
   </div>
