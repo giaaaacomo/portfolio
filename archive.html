@@ -14,12 +14,341 @@
       cursor: default;
     }
   </style>
+  <script src="projects-data.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".archive-title").forEach((title) => {
-        title.addEventListener("click", function () {
-          title.closest(".archive-item").classList.toggle("is-open");
+      const imageFolder = "templates/immagini/";
+      const archiveProjects = Object.fromEntries(window.projectsData.map((project) => [project.slug, project]));
+      const archiveList = document.querySelector(".archive-list");
+      const archiveImageCache = new Map();
+      const archiveLightbox = document.querySelector(".archive-lightbox");
+      const archiveLightboxImage = document.querySelector(".archive-lightbox-image");
+      let archiveSlideshowInterval = null;
+      let currentOpenItem = null;
+
+      function getArchiveImageUrl(imageName) {
+        return `${imageFolder}${imageName}`;
+      }
+
+      function getArchivePlaceholderUrl(projectTitle, placeholderIndex) {
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750">
+            <rect width="1200" height="750" fill="#111111"/>
+            <rect x="24" y="24" width="1152" height="702" fill="none" stroke="#93E9BE" stroke-opacity="0.5" stroke-width="4"/>
+            <text x="60" y="116" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="300">${projectTitle}</text>
+            <text x="60" y="674" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="300">PLACEHOLDER ${placeholderIndex + 1}</text>
+          </svg>
+        `;
+
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+      }
+
+      function preloadArchiveImage(imageName) {
+        if (!imageName) {
+          return Promise.resolve(false);
+        }
+
+        if (archiveImageCache.has(imageName)) {
+          return archiveImageCache.get(imageName);
+        }
+
+        const image = new Image();
+        const imageUrl = getArchiveImageUrl(imageName);
+        const preload = new Promise((resolve) => {
+          image.onload = function () {
+            resolve(true);
+          };
+          image.onerror = function () {
+            resolve(false);
+          };
         });
+
+        image.src = imageUrl;
+        archiveImageCache.set(imageName, preload);
+        return preload;
+      }
+
+      function preloadArchiveProjectImages(project) {
+        project.images.forEach(preloadArchiveImage);
+      }
+
+      function stopArchiveSlideshow() {
+        if (archiveSlideshowInterval) {
+          clearInterval(archiveSlideshowInterval);
+          archiveSlideshowInterval = null;
+        }
+      }
+
+      function openArchiveLightbox(imageUrl, altText) {
+        archiveLightboxImage.src = imageUrl;
+        archiveLightboxImage.alt = altText || "";
+        archiveLightbox.hidden = false;
+      }
+
+      function closeArchiveLightbox() {
+        archiveLightbox.hidden = true;
+        archiveLightboxImage.src = "";
+        archiveLightboxImage.alt = "";
+      }
+
+      function showArchiveImages(item, project, imageIndex) {
+        const images = item.querySelectorAll(".archive-detail-media-image");
+        if (images.length === 0 || !project.images[imageIndex]) {
+          return;
+        }
+
+        const nextImageIndex = project.images.length > 1 ? (imageIndex + 1) % project.images.length : imageIndex;
+        const imageIndexes = [imageIndex, nextImageIndex];
+
+        images.forEach((image, slotIndex) => {
+          const slotImageIndex = imageIndexes[slotIndex] ?? imageIndex;
+          const imageUrl = getArchiveImageUrl(project.images[slotImageIndex]);
+          image.src = imageUrl;
+          image.alt = `${project.title} preview ${slotImageIndex + 1}`;
+          image.dataset.fullImage = imageUrl;
+          image.dataset.fullAlt = image.alt;
+        });
+
+        item.dataset.archiveImageIndex = String(imageIndex);
+      }
+
+      function startArchiveSlideshow(item, project) {
+        stopArchiveSlideshow();
+        currentOpenItem = item;
+        preloadArchiveProjectImages(project);
+        showArchiveImages(item, project, 0);
+
+        if (project.images.length <= 1) {
+          return;
+        }
+
+        archiveSlideshowInterval = window.setInterval(function () {
+          const currentImageIndex = Number(item.dataset.archiveImageIndex || 0);
+          const nextImageIndex = (currentImageIndex + 1) % project.images.length;
+
+          preloadArchiveImage(project.images[nextImageIndex]).then((loaded) => {
+            if (!loaded || currentOpenItem !== item || !item.classList.contains("is-open")) {
+              return;
+            }
+
+            showArchiveImages(item, project, nextImageIndex);
+          });
+        }, 2500);
+      }
+
+      function closeArchiveItems() {
+        document.querySelectorAll(".archive-item.is-open").forEach((item) => {
+          item.classList.remove("is-open");
+          const openTitle = item.querySelector(".archive-title");
+          if (openTitle) {
+            openTitle.setAttribute("aria-expanded", "false");
+          }
+        });
+        stopArchiveSlideshow();
+        currentOpenItem = null;
+      }
+
+      function toggleArchiveItem(item) {
+        const selectedProject = archiveProjects[item.dataset.project];
+        const title = item.querySelector(".archive-title");
+        const wasOpen = item.classList.contains("is-open");
+
+        closeArchiveItems();
+
+        if (!wasOpen && selectedProject) {
+          item.classList.add("is-open");
+          if (title) {
+            title.setAttribute("aria-expanded", "true");
+          }
+          startArchiveSlideshow(item, selectedProject);
+        }
+      }
+
+      function renderArchiveHeader() {
+        const columns = [
+          ["archive-head archive-head-title", "TITLE"],
+          ["archive-head archive-head-category", "CATEGORY"],
+          ["archive-head archive-head-client", "CLIENT"],
+          ["archive-head archive-head-year", "YEAR"]
+        ];
+
+        columns.forEach(([className, label]) => {
+          const header = document.createElement("div");
+          header.className = className;
+          header.textContent = label;
+          archiveList.appendChild(header);
+        });
+      }
+
+      function renderArchiveList() {
+        archiveList.innerHTML = "";
+        window.projectUtils.validateProjectData();
+        renderArchiveHeader();
+
+        window.projectUtils
+          .getArchivedProjects()
+          .forEach((project) => {
+            const item = document.createElement("article");
+            item.className = "archive-item";
+
+            const title = document.createElement("button");
+            title.className = "archive-title";
+            title.type = "button";
+            title.setAttribute("aria-expanded", "false");
+            title.textContent = project.title.toUpperCase();
+
+            const category = document.createElement("div");
+            category.className = "archive-category";
+            category.textContent = project.category || "";
+
+            const client = document.createElement("div");
+            client.className = "archive-client";
+            client.textContent = project.client || "";
+
+            const year = document.createElement("div");
+            year.className = "archive-year";
+            year.textContent = project.year || "";
+
+            const body = document.createElement("div");
+            body.className = "archive-body";
+            body.innerHTML = project.text || "";
+
+            const mediaPrimary = document.createElement("button");
+            mediaPrimary.className = "archive-detail-media";
+            mediaPrimary.type = "button";
+
+            const mediaPrimaryImage = document.createElement("img");
+            mediaPrimaryImage.className = "archive-detail-media-image";
+            mediaPrimaryImage.alt = "";
+            mediaPrimary.appendChild(mediaPrimaryImage);
+
+            const mediaSecondary = document.createElement("button");
+            mediaSecondary.className = "archive-detail-media archive-detail-media-secondary";
+            mediaSecondary.type = "button";
+
+            const mediaSecondaryImage = document.createElement("img");
+            mediaSecondaryImage.className = "archive-detail-media-image";
+            mediaSecondaryImage.alt = "";
+            mediaSecondary.appendChild(mediaSecondaryImage);
+
+            const caseStudy = document.createElement("a");
+            caseStudy.className = "archive-case-study";
+            caseStudy.href = project.caseStudyUrl || "https://example.com";
+            caseStudy.target = "_blank";
+            caseStudy.rel = "noreferrer";
+            caseStudy.textContent = "CASE STUDY";
+
+            const metaValues = [project.category, project.client, project.year].filter(Boolean);
+            if (metaValues.length > 0) {
+              const meta = document.createElement("div");
+              meta.className = "archive-meta";
+
+              metaValues.forEach((value) => {
+                const metaItem = document.createElement("span");
+                metaItem.textContent = value;
+                meta.appendChild(metaItem);
+              });
+
+              const metaCaseStudy = document.createElement("a");
+              metaCaseStudy.className = "archive-meta-case-study";
+              metaCaseStudy.href = project.caseStudyUrl || "https://example.com";
+              metaCaseStudy.target = "_blank";
+              metaCaseStudy.rel = "noreferrer";
+              metaCaseStudy.textContent = "CASE STUDY";
+              meta.appendChild(metaCaseStudy);
+
+              body.appendChild(meta);
+            }
+
+            if (project.images.length > 0) {
+              const mobileCarousel = document.createElement("div");
+              mobileCarousel.className = "archive-mobile-carousel";
+              const mobileCarouselAssets = project.images.map((imageName, imageIndex) => ({
+                url: getArchiveImageUrl(imageName),
+                alt: `${project.title} preview ${imageIndex + 1}`
+              }));
+              const minimumMobileSlides = 3;
+
+              for (let placeholderIndex = mobileCarouselAssets.length; placeholderIndex < minimumMobileSlides; placeholderIndex += 1) {
+                mobileCarouselAssets.push({
+                  url: getArchivePlaceholderUrl(project.title.toUpperCase(), placeholderIndex - project.images.length),
+                  alt: `${project.title} placeholder ${placeholderIndex - project.images.length + 1}`
+                });
+              }
+
+              mobileCarouselAssets.forEach((asset) => {
+                const mobileCarouselButton = document.createElement("button");
+                mobileCarouselButton.className = "archive-mobile-carousel-button";
+                mobileCarouselButton.type = "button";
+
+                const mobileCarouselImage = document.createElement("img");
+                mobileCarouselImage.className = "archive-mobile-carousel-image";
+                mobileCarouselImage.src = asset.url;
+                mobileCarouselImage.alt = asset.alt;
+                mobileCarouselImage.dataset.fullImage = asset.url;
+                mobileCarouselImage.dataset.fullAlt = asset.alt;
+
+                mobileCarouselButton.appendChild(mobileCarouselImage);
+                mobileCarousel.appendChild(mobileCarouselButton);
+              });
+
+              body.appendChild(mobileCarousel);
+            }
+
+            item.dataset.project = project.slug;
+            item.append(title, category, client, year, body, mediaPrimary, mediaSecondary, caseStudy);
+            archiveList.appendChild(item);
+          });
+      }
+
+      renderArchiveList();
+
+      document.querySelectorAll(".archive-item").forEach((item) => {
+        item.addEventListener("click", function (event) {
+          if (event.target.closest(".archive-detail-media, .archive-case-study, .archive-body, .archive-mobile-carousel-button")) {
+            return;
+          }
+
+          toggleArchiveItem(item);
+        });
+        item.addEventListener("mouseenter", function () {
+          item.classList.add("is-hovered");
+        });
+        item.addEventListener("mouseleave", function () {
+          item.classList.remove("is-hovered");
+        });
+      });
+
+      document.querySelectorAll(".archive-detail-media").forEach((media) => {
+        media.addEventListener("click", function () {
+          const image = media.querySelector(".archive-detail-media-image");
+          if (!image || !image.dataset.fullImage) {
+            return;
+          }
+
+          openArchiveLightbox(image.dataset.fullImage, image.dataset.fullAlt);
+        });
+      });
+
+      document.querySelectorAll(".archive-mobile-carousel-button").forEach((button) => {
+        button.addEventListener("click", function () {
+          const image = button.querySelector(".archive-mobile-carousel-image");
+          if (!image || !image.dataset.fullImage) {
+            return;
+          }
+
+          openArchiveLightbox(image.dataset.fullImage, image.dataset.fullAlt);
+        });
+      });
+
+      archiveLightbox.addEventListener("click", function () {
+        closeArchiveLightbox();
+      });
+
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !archiveLightbox.hidden) {
+          closeArchiveLightbox();
+        }
       });
     });
   </script>
@@ -29,163 +358,16 @@
   <div class="contenitore">
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a href="index.html">PORTFOLIO</a></div>
-    <div class="cella" id="a5"><span class="version-label">v4</span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
+    <div class="cella" id="a5"><span class="version-label">v4</span><a class="mobile-archive-link active-page-link" href="archive.html" aria-current="page">ARCHIVE</a></div>
 
-    <main class="archive-list" aria-label="Archive">
-      <article class="archive-item">
-        <button class="archive-title" type="button">ARCAICO</button>
-        <div class="archive-category">INSTALLATION</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2024</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae arcu non tortor gravida luctus.
-          <div class="archive-meta">
-            <span>INSTALLATION</span>
-            <span>LOREM IPSUM</span>
-            <span>2024</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">KHATARSIS</button>
-        <div class="archive-category">EXPERIENCE</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2023</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vel nibh sed risus fermentum posuere.
-          <div class="archive-meta">
-            <span>EXPERIENCE</span>
-            <span>LOREM IPSUM</span>
-            <span>2023</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">ARGO</button>
-        <div class="archive-category">IDENTITY</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2023</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae augue nec lorem ultricies aliquam.
-          <div class="archive-meta">
-            <span>IDENTITY</span>
-            <span>LOREM IPSUM</span>
-            <span>2023</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">CLUSTER</button>
-        <div class="archive-category">INTERACTION</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2023</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit sapien at massa luctus, non dictum erat luctus.
-          <div class="archive-meta">
-            <span>INTERACTION</span>
-            <span>LOREM IPSUM</span>
-            <span>2023</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">TIF</button>
-        <div class="archive-category">EXPERIENCE</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2024</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi faucibus quam vel augue dignissim efficitur.
-          <div class="archive-meta">
-            <span>EXPERIENCE</span>
-            <span>LOREM IPSUM</span>
-            <span>2024</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">ATTRAVERSO</button>
-        <div class="archive-category">EDITORIAL</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2022</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu turpis eget justo feugiat suscipit.
-          <div class="archive-meta">
-            <span>EDITORIAL</span>
-            <span>LOREM IPSUM</span>
-            <span>2022</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">ARCAL</button>
-        <div class="archive-category">AR</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2021</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam in nunc at justo pulvinar commodo.
-          <div class="archive-meta">
-            <span>AR</span>
-            <span>LOREM IPSUM</span>
-            <span>2021</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">ABACEDARIO</button>
-        <div class="archive-category">RESEARCH</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2020</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ullamcorper magna non eros porta vulputate.
-          <div class="archive-meta">
-            <span>RESEARCH</span>
-            <span>LOREM IPSUM</span>
-            <span>2020</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">INSTABILE</button>
-        <div class="archive-category">PRINT</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2017</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean suscipit ligula et sapien luctus gravida.
-          <div class="archive-meta">
-            <span>PRINT</span>
-            <span>LOREM IPSUM</span>
-            <span>2017</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="archive-item">
-        <button class="archive-title" type="button">MENDELEEVAR</button>
-        <div class="archive-category">AR</div>
-        <div class="archive-client">LOREM IPSUM</div>
-        <div class="archive-year">2019</div>
-        <div class="archive-body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus metus ac quam elementum vulputate.
-          <div class="archive-meta">
-            <span>AR</span>
-            <span>LOREM IPSUM</span>
-            <span>2019</span>
-          </div>
-        </div>
-      </article>
-    </main>
+    <main class="archive-list" aria-label="Archive"></main>
 
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
-    <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>
+    <div class="cella" id="k5"><a class="active-page-link" href="archive.html" aria-current="page">ARCHIVE</a></div>
+  </div>
+  <div class="archive-lightbox" hidden>
+    <img class="archive-lightbox-image" alt="">
   </div>
 </body>
 
