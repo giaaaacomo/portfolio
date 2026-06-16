@@ -86,6 +86,23 @@
     preloadAllProjectImages();
 
     document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".version-button").forEach((button) => {
+        button.addEventListener("click", function () {
+          const versionControl = button.closest(".version-control");
+          if (!versionControl) {
+            return;
+          }
+
+          versionControl.classList.remove("is-bursting");
+          window.requestAnimationFrame(() => {
+            versionControl.classList.add("is-bursting");
+            window.setTimeout(() => {
+              versionControl.classList.remove("is-bursting");
+            }, 2200);
+          });
+        });
+      });
+
       const homeContainer = document.querySelector(".contenitore");
       const imageContainer = document.querySelector(".image");
       const fileContainer = document.querySelector(".file");
@@ -209,33 +226,46 @@
           });
       }
 
-      function tightenHomeTitleTracking() {
-        const maxTighteningEm = 0.055;
+      function fitHomeTitles() {
+        const minScale = 0.64;
+        const horizontalBreathingRoom = 18;
+        const titles = Array.from(document.querySelectorAll(".tit[data-project]"));
+        let sharedScale = 1;
 
-        document.querySelectorAll(".tit[data-project]").forEach((title) => {
+        titles.forEach((title) => {
           title.style.letterSpacing = "0px";
+          title.style.fontSize = "";
+        });
 
-          const titleLength = title.textContent.trim().length;
-          if (titleLength <= 1 || title.scrollWidth <= title.clientWidth) {
+        titles.forEach((title) => {
+          const availableWidth = Math.max(
+            title.clientWidth - horizontalBreathingRoom,
+            title.clientWidth * 0.88
+          );
+
+          if (title.scrollWidth <= availableWidth) {
             return;
           }
 
-          const fontSize = parseFloat(window.getComputedStyle(title).fontSize);
-          const overflowWidth = title.scrollWidth - title.clientWidth;
-          const neededTightening = overflowWidth / (titleLength - 1);
-          const maxTightening = fontSize * maxTighteningEm;
-          const appliedTightening = Math.min(neededTightening, maxTightening);
+          sharedScale = Math.min(sharedScale, Math.max(availableWidth / title.scrollWidth, minScale));
+        });
 
-          title.style.letterSpacing = `${-appliedTightening}px`;
+        if (sharedScale < 1 && titles.length > 0) {
+          const baseFontSize = parseFloat(window.getComputedStyle(titles[0]).fontSize);
+          titles.forEach((title) => {
+            title.style.fontSize = `${baseFontSize * sharedScale}px`;
+          });
+        }
 
+        titles.forEach((title) => {
           if (title.scrollWidth > title.clientWidth + 1) {
-            console.warn(`Title "${title.textContent}" still overflows after tracking adjustment.`);
+            console.warn(`Title "${title.textContent}" still overflows after font-size adjustment.`);
           }
         });
       }
 
-      function requestHomeTitleTracking() {
-        requestAnimationFrame(tightenHomeTitleTracking);
+      function requestHomeTitleFit() {
+        requestAnimationFrame(fitHomeTitles);
       }
 
       function getProjectFromTitle(title) {
@@ -334,10 +364,10 @@
       }
 
       renderHomeProjects();
-      requestHomeTitleTracking();
+      requestHomeTitleFit();
 
       if (document.fonts) {
-        document.fonts.ready.then(requestHomeTitleTracking);
+        document.fonts.ready.then(requestHomeTitleFit);
       }
 
       document.querySelectorAll(".tit").forEach((title) => {
@@ -384,7 +414,7 @@
       }
       setInterval(changeImage, 2500); //ogni 5 secondi
 
-      window.addEventListener("resize", requestHomeTitleTracking);
+      window.addEventListener("resize", requestHomeTitleFit);
     });
 
 
@@ -395,7 +425,7 @@
   <div class="contenitore">
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a class="active-page-link" href="index.html" aria-current="page">PORTFOLIO</a></div>
-    <div class="cella" id="a5"><span class="version-label">v4</span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
+    <div class="cella" id="a5"><span class="version-control version-label"><button class="version-button" type="button">v5</button><span class="version-burst" aria-hidden="true">✨</span></span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
     <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>
