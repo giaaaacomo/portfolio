@@ -23,6 +23,7 @@
   &#x2800&#x2800&#x2800&#x2800&#x2800
  -->
   <script src="projects-data.js"></script>
+  <script src="site-meta.js"></script>
   <script>
   
 
@@ -86,23 +87,6 @@
     preloadAllProjectImages();
 
     document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".version-button").forEach((button) => {
-        button.addEventListener("click", function () {
-          const versionControl = button.closest(".version-control");
-          if (!versionControl) {
-            return;
-          }
-
-          versionControl.classList.remove("is-bursting");
-          window.requestAnimationFrame(() => {
-            versionControl.classList.add("is-bursting");
-            window.setTimeout(() => {
-              versionControl.classList.remove("is-bursting");
-            }, 2200);
-          });
-        });
-      });
-
       const homeContainer = document.querySelector(".contenitore");
       const imageContainer = document.querySelector(".image");
       const fileContainer = document.querySelector(".file");
@@ -447,7 +431,7 @@
   <div class="contenitore">
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a class="active-page-link" href="index.html" aria-current="page">PORTFOLIO</a></div>
-    <div class="cella" id="a5"><span class="version-control version-label"><button class="version-button" type="button">v5</button><span class="version-burst" aria-hidden="true">✨</span></span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
+    <div class="cella" id="a5"><span class="version-control version-label"><button class="version-button" type="button"></button><span class="version-date" aria-hidden="true"></span><span class="version-burst" aria-hidden="true"></span></span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo" target="_blank" rel="noreferrer">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
     <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>

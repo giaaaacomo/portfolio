@@ -217,13 +217,41 @@ p {
   text-shadow: var(--marker-glow);
 }
 
+.version-date,
 .version-burst {
   opacity: 0;
   pointer-events: none;
 }
 
+.version-date {
+  color: var(--marker);
+  text-shadow: var(--marker-glow);
+}
+
+.version-control.is-bursting .version-date {
+  animation: version-date 2200ms ease-out both;
+}
+
 .version-control.is-bursting .version-burst {
   animation: version-burst 2200ms ease-out both;
+}
+
+@keyframes version-date {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  12%,
+  68% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
 }
 
 @keyframes version-burst {
