@@ -1,3 +1,5 @@
+window.inherit = window.inherit || "__inherit__";
+
 // Sorting fields:
 // important: true moves the project above non-important projects.
 // manualOrder: optional number that overrides automatic sorting. Use gaps like 10, 20, 30.
@@ -8,15 +10,22 @@ window.projectsData = [
     year: 2025,
     featured: true,
     important: true,
+    caseStudy: "chronotes",
     category: "TOOLSET, XR",
     client: "MA Thesis Project",
-    images: ["arcaico0.webp"],
+    images: [
+      "chronotes-case/xr-vr-overview.jpg",
+      "chronotes-case/xr-desktop-timeline.jpg",
+      "chronotes-case/tool-exploded-view.jpg",
+      "chronotes-case/xr-tablet-ar.jpg",
+      "chronotes-case/xr-wearable-ar.jpg"
+    ],
     text: `ChroNotes is a design-driven toolset for managing evolving knowledge inside industrial spatial computing environments. Conceived as an extension of the PROXIMA framework, it adds a temporal layer to spatial information, allowing notes, instructions, and machine-linked data to be organized and updated over time.
 The interface uses visual metaphors such as spatio-temporal stacking and exploded views to treat notes as atomic units of knowledge that can stratify, branch, and change across versions. Natural hand-tracking interactions, based on gestures such as pinch and wrist rotation, were designed to reduce cognitive load and make the system accessible without physical controllers.
 Operating across VR, AR, and desktop environments, ChroNotes integrates AI-driven curation to collect data from connected machinery, generate summaries, and identify breaking changes or outdated information. The result is a dynamic knowledge base for Industry 5.0, where spatial instructions become evolving, contextual layers of information.`,
-    links: [
-      { label: "link", href: "", wip: true }
-    ]
+    // links: [
+    //   { label: "link", href: "", wip: true }
+    // ]
   },
   {
     slug: "tw++",
@@ -26,8 +35,13 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
     important: false,
     category: "GNOME TOOL",
     client: "PERSONAL",
-    images: ["arcaico0.webp"],
-    text: `TW++, or Task Widget++, is a GNOME extension forked from the now-deprecated <a href="https://gitlab.com/jmiskinis/gnome-shell-extension-task-widget">Task Widget</a>. It retains the original ability to show tasks from online providers in the date panel as a widget. On top of that, TW++ adds two main features: M365 fetching and task input. It is now possible to add new tasks directly from the UI, as well as edit, star, delete and add due dates to them. Every part of the widget is designed to integrate perfectly with GNOME interfaces and follows the GNOME HIG. A major effort has been made to completely revamp interactions to enable the new features.`,
+    images: [
+      "task-widget-overview.webp",
+      "task-widget-inline-add.webp",
+      "task-widget-date-picker.webp",
+      "task-widget-context-menu.webp"
+    ],
+    text: `TW++ (or Task Widget++) is a GNOME extension forked from the now-deprecated <a href="https://gitlab.com/jmiskinis/gnome-shell-extension-task-widget">Task Widget</a>. It retains the original ability to show tasks from online providers in the date panel as a widget. On top of that, TW++ adds two main features: M365 fetching and task input. It is now possible to add new tasks directly from the UI, as well as edit, star, delete and add due dates to them. Every part of the widget is designed to integrate perfectly with GNOME interfaces and follows the GNOME HIG. A major effort has been made to completely revamp interactions to enable the new features.`,
     links: [
       { label: "GITLAB", href: "https://gitlab.com/giaaaacomo/task-widget-plusplus", wip: false }
     ]
@@ -55,9 +69,11 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
     category: "INTERACTIVE EXPERIENCE",
     client: "Pesaro2024",
     images: ["khatarsis0.webp", "khatarsis1.webp", "khatarsis2.webp", "khatarsis3.webp", "khatarsis4.webp", "khatarsis5.webp", "khatarsis6.webp", "khatarsis7.webp", "khatarsis8.webp", "khatarsis9.webp"],
-    text: `Khatarsis is an immersive experience designed for the former San Benedetto psychiatric hospital in Pesaro. The entire experience takes place inside the garden and is divided into three parts: The Trap, The Touchpoints and The Sonosphere. In short, it is an open-air museum made up of stories, sounds, and lights that can be visited and enjoyed by everyone.`,
+    text: `Khatarsis is an immersive experience designed for the former San Benedetto psychiatric hospital in Pesaro. The entire experience takes place inside the garden and is divided into three parts: The Trap, The Touchpoints and The Sonosphere. In short, it is an open-air museum made up of stories, sounds, and lights that can be visited and enjoyed by everyone. A photogrammetric scan of the area has been conducted, allowing us to freeze in time such a precarious place, and to virtually replicate the experience online.`,
     links: [
-      { label: "BEHANCE", href: "https://www.behance.net/gallery/182835117/Immersive-Experience-in-a-former-psychiatric-hospital", wip: false }
+      { label: "BEHANCE", href: "https://www.behance.net/gallery/182835117/Immersive-Experience-in-a-former-psychiatric-hospital", wip: false },
+      { label: "SPATIAL.IO", href: "https://www.spatial.io/s/Khatarsis-ex-manicomio-San-Benedetto-Pesaro-649cbb31a21172d1b53ec8a3?share=0", wip: false },
+      { label: "SKETCHFAB", href: "https://skfb.ly/pL6JR", wip: false }
     ]
   },
   {
@@ -153,7 +169,7 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
     category: "PRINT",
     client: "AABB URBINO",
     images: ["instabile0.webp"],
-    text: `For the 2017 final exposition of the School of Sculpture at the Academy of Fine Arts in Urbino, I designed, in collaboration with Lorenzo Lembo, a poster and a catalogue. The works were inspired by the physical peculiarities of the exhibition space, and explored the concept of instability. The poster replicates the physicality of how the captions of the art pieces were displayed, while the catalogue presents a constant variation of the layout elements.`,
+    text: `For the 2017 final exposition of the School of Sculpture at the Academy of Fine Arts in Urbino, I designed, in collaboration with Lorenzo Lembo, the official poster and catalogue. The works were inspired by the physical peculiarities of the exhibition space, and explored the concept of instability. The poster replicates the physicality of how the captions of the art pieces were displayed, while the catalogue presents a constant variation of the layout elements.`,
     links: [
       { label: "CATALOGUE", href: "https://issuu.com/giancarlolepore/docs/catalogo-instabilefin", wip: false }
     ]
@@ -232,6 +248,20 @@ window.projectUtils = (function () {
       }));
   }
 
+  function getProjectCaseStudyLink(project) {
+    if (!project || typeof project.caseStudy !== "string" || project.caseStudy.trim() === "") {
+      return null;
+    }
+
+    const caseStudySlug = project.caseStudy.trim();
+
+    return {
+      label: "CASE STUDY",
+      href: `case-study.html?project=${encodeURIComponent(caseStudySlug)}`,
+      caseStudy: caseStudySlug
+    };
+  }
+
   function validateProjectData() {
     const usedSlugs = new Map();
     const usedManualOrders = new Map();
@@ -263,6 +293,10 @@ window.projectUtils = (function () {
         console.error(`Invalid links field for project "${project.slug}": expected an array.`);
       }
 
+      if (project.caseStudy !== undefined && typeof project.caseStudy !== "string") {
+        console.error(`Invalid caseStudy field for project "${project.slug}": expected a string.`);
+      }
+
       if (Array.isArray(project.links)) {
         project.links.forEach((link, linkIndex) => {
           if (!link || typeof link.label !== "string" || link.label.trim() === "") {
@@ -283,6 +317,7 @@ window.projectUtils = (function () {
     getArchivedProjects,
     getFeaturedProjects,
     getOrderedProjects,
+    getProjectCaseStudyLink,
     getProjectLinks,
     validateProjectData
   };

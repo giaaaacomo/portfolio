@@ -23,6 +23,8 @@
   &#x2800&#x2800&#x2800&#x2800&#x2800
  -->
   <script src="projects-data.js"></script>
+  <script src="case-studies-data.js"></script>
+  <script src="case-study-renderer.js"></script>
   <script src="site-meta.js"></script>
   <script>
   
@@ -98,6 +100,7 @@
       const fileContentText = document.querySelector(".file-content-div-text");
       const fileProjectMeta = document.querySelector(".file-project-meta");
       const fileFooterLink = document.querySelector(".file-footer-link");
+      const inlineCaseStudyRoot = document.querySelector("[data-inline-case-study-root]");
       const fileClose = document.querySelector(".file-close-svg");
       let currentProject = null;
       let currentImageIndex = 0;
@@ -134,13 +137,23 @@
         fileFooterLink.classList.remove("has-footer-content");
         fileContentText.classList.remove("has-project-links", "has-no-project-links");
 
+        const caseStudyLink = window.projectUtils.getProjectCaseStudyLink(project);
         const projectLinks = window.projectUtils.getProjectLinks(project);
-        if (projectLinks.length === 0) {
+        if (!caseStudyLink && projectLinks.length === 0) {
           fileContentText.classList.add("has-no-project-links");
           return;
         }
 
         fileContentText.classList.add("has-project-links");
+
+        if (caseStudyLink) {
+          const caseStudyElement = document.createElement("a");
+          caseStudyElement.className = "file-footer-anchor file-case-study-anchor";
+          caseStudyElement.href = caseStudyLink.href;
+          caseStudyElement.dataset.caseStudy = caseStudyLink.caseStudy;
+          caseStudyElement.textContent = caseStudyLink.label;
+          fileFooterLink.appendChild(caseStudyElement);
+        }
 
         projectLinks.forEach((link) => {
           const linkElement = link.href ? document.createElement("a") : document.createElement("span");
@@ -230,45 +243,76 @@
       }
 
       function fitHomeTitles() {
-        const minScale = 0.64;
-        const horizontalBreathingRoom = 18;
+        const minSharedScale = 0.64;
+        const minCondense = 0.88;
+        const horizontalBreathingRoom = 32;
         const titles = Array.from(document.querySelectorAll(".tit[data-project]"));
-        let sharedScale = 1;
+        if (titles.length === 0) {
+          return;
+        }
 
         titles.forEach((title) => {
-          title.style.letterSpacing = "0px";
           title.style.fontSize = "";
+          title.style.setProperty("--title-condense", "1");
         });
+
+        const baseFontSize = parseFloat(window.getComputedStyle(titles[0]).fontSize);
+        let sharedScale = 1;
+        const measureCanvas = fitHomeTitles.measureCanvas || document.createElement("canvas");
+        const measureContext = measureCanvas.getContext("2d");
+        fitHomeTitles.measureCanvas = measureCanvas;
+
+        function getTitleTextWidth(title, fontSize = baseFontSize) {
+          const style = window.getComputedStyle(title);
+          measureContext.font = `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${fontSize}px ${style.fontFamily}`;
+          return measureContext.measureText(title.textContent).width;
+        }
 
         titles.forEach((title) => {
           const availableWidth = Math.max(
             title.clientWidth - horizontalBreathingRoom,
             title.clientWidth * 0.88
           );
+          const textWidth = getTitleTextWidth(title);
 
-          if (title.scrollWidth <= availableWidth) {
+          const requiredCondense = availableWidth / textWidth;
+          if (requiredCondense >= minCondense) {
             return;
           }
 
-          sharedScale = Math.min(sharedScale, Math.max(availableWidth / title.scrollWidth, minScale));
+          sharedScale = Math.min(sharedScale, Math.max(requiredCondense / minCondense, minSharedScale));
         });
 
-        if (sharedScale < 1 && titles.length > 0) {
-          const baseFontSize = parseFloat(window.getComputedStyle(titles[0]).fontSize);
+        if (sharedScale < 1) {
           titles.forEach((title) => {
             title.style.fontSize = `${baseFontSize * sharedScale}px`;
           });
         }
 
         titles.forEach((title) => {
-          if (title.scrollWidth > title.clientWidth + 1) {
-            console.warn(`Title "${title.textContent}" still overflows after font-size adjustment.`);
+          const scaledFontSize = baseFontSize * sharedScale;
+          const availableWidth = Math.max(
+            title.clientWidth - horizontalBreathingRoom,
+            title.clientWidth * 0.88
+          );
+          const textWidth = getTitleTextWidth(title, scaledFontSize);
+          const condense = Math.max(Math.min(availableWidth / textWidth, 1), minCondense);
+          title.style.setProperty("--title-condense", String(condense));
+        });
+
+        titles.forEach((title) => {
+          const scaledFontSize = baseFontSize * sharedScale;
+          const visualWidth = getTitleTextWidth(title, scaledFontSize) * parseFloat(title.style.getPropertyValue("--title-condense") || "1");
+          if (visualWidth > title.clientWidth + 1) {
+            console.warn(`Title "${title.textContent}" still overflows after title fitting.`);
           }
         });
       }
 
       function requestHomeTitleFit() {
+        fitHomeTitles();
         requestAnimationFrame(fitHomeTitles);
+        window.setTimeout(fitHomeTitles, 80);
       }
 
       function getProjectFromTitle(title) {
@@ -334,6 +378,8 @@
           return;
         }
 
+        fileContainer.classList.remove("is-case-study");
+        inlineCaseStudyRoot.innerHTML = "";
         currentProject = project;
         currentImageIndex = 0;
         const requestId = slideshowRequestId + 1;
@@ -361,12 +407,29 @@
         });
       }
 
+      function openCaseStudy(caseStudySlug) {
+        if (!caseStudySlug || !window.caseStudyRenderer) {
+          return;
+        }
+
+        currentProject = null;
+        slideshowRequestId += 1;
+        fileContainer.classList.add("is-case-study");
+        fileContainer.style.display = "block";
+        document.body.classList.add("is-project-open");
+        window.caseStudyRenderer.renderInto(inlineCaseStudyRoot, caseStudySlug, { mode: "inline" });
+        resetProjectScrollAfterLayout();
+      }
+
       function closeProject() {
+        window.caseStudyRenderer?.closeImageLightbox?.();
         fileContainer.style.display = "none";
         resetProjectScrollAfterLayout();
         currentProject = null;
         slideshowRequestId += 1;
         document.body.classList.remove("is-project-open");
+        fileContainer.classList.remove("is-case-study");
+        inlineCaseStudyRoot.innerHTML = "";
       }
 
       renderHomeProjects();
@@ -388,7 +451,21 @@
 
       fileClose.addEventListener("click", closeProject);
 
+      fileFooterLink.addEventListener("click", function (event) {
+        const caseStudyLink = event.target.closest("[data-case-study]");
+        if (!caseStudyLink) {
+          return;
+        }
+
+        event.preventDefault();
+        openCaseStudy(caseStudyLink.dataset.caseStudy);
+      });
+
       window.addEventListener('mouseup', function (event) {
+        if (event.target.closest("[data-case-study-lightbox]")) {
+          return;
+        }
+
         if (!(event.target.closest(".file"))) {
           closeProject();
         }
@@ -456,6 +533,7 @@
         <div class="file-footer-link"></div>
       </div>
     </div>
+    <div class="case-study-file-content" data-inline-case-study-root></div>
   </div>
   <!--   <div id="video-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none;"></div> -->
 </body>

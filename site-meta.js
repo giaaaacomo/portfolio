@@ -1,7 +1,7 @@
 (function () {
   const siteMeta = {
-    version: "v5.1",
-    updatedAt: "rev. 17/06/26",
+    version: "v6",
+    updatedAt: "rev. 18/06/26",
     versionBurst: "✨",
     versionBurstDuration: 2200,
   };
