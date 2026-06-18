@@ -57,7 +57,7 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
     images: ["arcaico0.webp"],
     text: `The project and poetics of Eduardo Souto de Moura convey a perspective on matter and aesthetics, shaping the perception of space and time, blending sacredness and antiquity to evoke an imaginary past. <br>"Arcaico" is situated in a time before time, where space and matter coexist in potential and in actuality, everything merging into a singular, liquid entity governed by the duality of entropy and imminence. The project was created for Fondazione Cini, which hosted the Vatican Pavilion for the Architecture Biennale of Venice.`,
     links: [
-      { label: "VIMEO", href: "", wip: true }
+      { label: "VIMEO", href: "https://vimeo.com/1025145739", wip: false }
     ]
   },
   {
@@ -154,7 +154,7 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
     important: false,
     category: "MULTIMEDIA",
     client: "BA project",
-    images: ["abacedario0.webp"],
+    images: ["placeholder:0", "placeholder:1"],
     text: `ABAcedario is a group project, made with Luigi Varacalli and Tommaso Pandolfi, in which we gave shape to three of the 26 keywords that the classroom had to work on, one for each letter of the alphabet. Our keywords were B as Big Data, I as Internet of Things, and U as Utopia. In "B as Big Data" we decided to print all the data available to Meta regarding Luigi, one of the team members, and made it into a book. It's something like a physical representation of the person constructed by the algorithms. The book has more than 900 pages printed in 3pt font size.
     In "I as Internet of Things", we designed a series of ten posters based on a reinterpretation of the key characteristics of the Internet of Things described by Kavyashree G. C. in "Internet of Things (IoT) Characteristics" (2016), expanded into ten conceptual categories. The posters feature a steep ASCII art that only makes true sense when viewed against the light, revealing color spots printed on the back.
     "U as Utopia" is a video installation that must be worn: it consists of a wooden box with mirrors on all internal sides except for the front, which has a cloth screen onto which a video is projected from the rear. The video chromatically completes this utopic experience by showing macro recordings of colored ink drops relating and connecting to each other at different temperatures, while a custom-composed track by <a href="https://www.instagram.com/tommaso.pandolfi/" target="_blank">Furtherset</a> plays in the wooden box.`,
@@ -192,6 +192,7 @@ Operating across VR, AR, and desktop environments, ChroNotes integrates AI-drive
 
 window.projectUtils = (function () {
   const projects = window.projectsData;
+  const imageFolder = "templates/immagini/";
 
   function getManualOrder(project) {
     const manualOrder = Number(project.manualOrder);
@@ -262,6 +263,46 @@ window.projectUtils = (function () {
     };
   }
 
+  function escapeSvgText(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function isPlaceholderImage(imageName) {
+    return typeof imageName === "string" && imageName.startsWith("placeholder:");
+  }
+
+  function getProjectPlaceholderUrl(projectTitle, placeholderIndex = 0) {
+    const safeTitle = escapeSvgText(projectTitle || "PROJECT");
+    const safeIndex = Number.isFinite(Number(placeholderIndex)) ? Number(placeholderIndex) : 0;
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750">
+        <rect width="1200" height="750" fill="#111111"/>
+        <rect x="24" y="24" width="1152" height="702" fill="none" stroke="#93E9BE" stroke-opacity="0.5" stroke-width="4"/>
+        <text x="60" y="116" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="300">${safeTitle}</text>
+        <text x="60" y="674" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="300">PLACEHOLDER ${safeIndex + 1}</text>
+      </svg>
+    `;
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  function getProjectImageUrl(imageName, projectTitle = "") {
+    if (isPlaceholderImage(imageName)) {
+      const placeholderIndex = Number(imageName.split(":")[1] || 0);
+      return getProjectPlaceholderUrl(String(projectTitle).toUpperCase(), placeholderIndex);
+    }
+
+    if (typeof imageName === "string" && /^(data:|https?:|blob:)/.test(imageName)) {
+      return imageName;
+    }
+
+    return `${imageFolder}${imageName}`;
+  }
+
   function validateProjectData() {
     const usedSlugs = new Map();
     const usedManualOrders = new Map();
@@ -297,6 +338,10 @@ window.projectUtils = (function () {
         console.error(`Invalid caseStudy field for project "${project.slug}": expected a string.`);
       }
 
+      if (!Array.isArray(project.images)) {
+        console.error(`Invalid images field for project "${project.slug}": expected an array.`);
+      }
+
       if (Array.isArray(project.links)) {
         project.links.forEach((link, linkIndex) => {
           if (!link || typeof link.label !== "string" || link.label.trim() === "") {
@@ -318,7 +363,10 @@ window.projectUtils = (function () {
     getFeaturedProjects,
     getOrderedProjects,
     getProjectCaseStudyLink,
+    getProjectImageUrl,
+    getProjectPlaceholderUrl,
     getProjectLinks,
+    isPlaceholderImage,
     validateProjectData
   };
 })();

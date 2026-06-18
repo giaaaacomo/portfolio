@@ -29,25 +29,22 @@
   <script>
   
 
-    const imageFolder = "templates/immagini/";
-
-    function getProjectImageUrl(imageName) {
-      return `${imageFolder}${imageName}`;
-    }
-
-
     const projectList = window.projectsData;
     const projects = Object.fromEntries(projectList.map(project => [project.slug, project]));
     const homeSlots = ["d1", "d2", "e1", "e2", "f1", "f2", "g1", "g2", "h1", "h2"];
 
     const imagePreloadCache = new Map();
 
-    function preloadImage(imageName) {
-      if (imagePreloadCache.has(imageName)) {
-        return imagePreloadCache.get(imageName);
+    function getProjectImageUrl(imageName, projectTitle = "") {
+      return window.projectUtils.getProjectImageUrl(imageName, projectTitle);
+    }
+
+    function preloadImage(imageName, projectTitle = "") {
+      const imageUrl = getProjectImageUrl(imageName, projectTitle);
+      if (imagePreloadCache.has(imageUrl)) {
+        return imagePreloadCache.get(imageUrl);
       }
 
-      const imageUrl = getProjectImageUrl(imageName);
       const image = new Image();
       image.decoding = "async";
 
@@ -61,22 +58,22 @@
       });
 
       image.src = imageUrl;
-      imagePreloadCache.set(imageName, preload);
+      imagePreloadCache.set(imageUrl, preload);
       return preload;
     }
 
     function preloadProjectImages(project) {
-      project.images.forEach(preloadImage);
+      project.images.forEach((imageName) => preloadImage(imageName, project.title));
     }
 
     function preloadAllProjectImages() {
-      const firstImages = projectList.map(project => project.images[0]);
-      const remainingImages = projectList.flatMap(project => project.images.slice(1));
+      const firstImages = projectList.map(project => [project.images[0], project.title]);
+      const remainingImages = projectList.flatMap(project => project.images.slice(1).map((imageName) => [imageName, project.title]));
 
-      firstImages.forEach(preloadImage);
+      firstImages.forEach(([imageName, projectTitle]) => preloadImage(imageName, projectTitle));
 
       const preloadRemainingImages = function () {
-        remainingImages.forEach(preloadImage);
+        remainingImages.forEach(([imageName, projectTitle]) => preloadImage(imageName, projectTitle));
       };
 
       if ("requestIdleCallback" in window) {
@@ -320,7 +317,7 @@
       }
 
       function showProjectImage(project, imageIndex, instant = false) {
-        const imageUrl = getProjectImageUrl(project.images[imageIndex]);
+        const imageUrl = getProjectImageUrl(project.images[imageIndex], project.title);
         const nextLayerIndex = instant ? activeImageLayerIndex : 1 - activeImageLayerIndex;
         const nextLayer = fileImageLayers[nextLayerIndex];
         const currentLayer = fileImageLayers[activeImageLayerIndex];
@@ -364,7 +361,7 @@
           return;
         }
 
-        imageContainer.style.backgroundImage = `url("${getProjectImageUrl(project.images[0])}")`;
+        imageContainer.style.backgroundImage = `url("${getProjectImageUrl(project.images[0], project.title)}")`;
         imageContainer.style.display = "block";
       }
 
@@ -392,7 +389,7 @@
         syncProjectFooterLink(currentProject);
         resetProjectScrollAfterLayout();
 
-        preloadImage(currentProject.images[0]).then(() => {
+        preloadImage(currentProject.images[0], currentProject.title).then(() => {
           if (currentProject !== project || slideshowRequestId !== requestId) {
             return;
           }
@@ -481,7 +478,7 @@
         const requestId = slideshowRequestId + 1;
         slideshowRequestId = requestId;
 
-        preloadImage(project.images[nextImageIndex]).then((loaded) => {
+        preloadImage(project.images[nextImageIndex], project.title).then((loaded) => {
           if (!loaded || currentProject !== project || slideshowRequestId !== requestId) {
             return;
           }

@@ -18,7 +18,6 @@
   <script src="site-meta.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const imageFolder = "templates/immagini/";
       const archiveProjects = Object.fromEntries(window.projectsData.map((project) => [project.slug, project]));
       const archiveList = document.querySelector(".archive-list");
       const archiveImageCache = new Map();
@@ -27,34 +26,25 @@
       let archiveSlideshowInterval = null;
       let currentOpenItem = null;
 
-      function getArchiveImageUrl(imageName) {
-        return `${imageFolder}${imageName}`;
+      function getArchiveImageUrl(imageName, projectTitle = "") {
+        return window.projectUtils.getProjectImageUrl(imageName, projectTitle);
       }
 
       function getArchivePlaceholderUrl(projectTitle, placeholderIndex) {
-        const svg = `
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750">
-            <rect width="1200" height="750" fill="#111111"/>
-            <rect x="24" y="24" width="1152" height="702" fill="none" stroke="#93E9BE" stroke-opacity="0.5" stroke-width="4"/>
-            <text x="60" y="116" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="300">${projectTitle}</text>
-            <text x="60" y="674" fill="#93E9BE" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="300">PLACEHOLDER ${placeholderIndex + 1}</text>
-          </svg>
-        `;
-
-        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        return window.projectUtils.getProjectPlaceholderUrl(projectTitle, placeholderIndex);
       }
 
-      function preloadArchiveImage(imageName) {
+      function preloadArchiveImage(imageName, projectTitle = "") {
         if (!imageName) {
           return Promise.resolve(false);
         }
 
-        if (archiveImageCache.has(imageName)) {
-          return archiveImageCache.get(imageName);
+        const imageUrl = getArchiveImageUrl(imageName, projectTitle);
+        if (archiveImageCache.has(imageUrl)) {
+          return archiveImageCache.get(imageUrl);
         }
 
         const image = new Image();
-        const imageUrl = getArchiveImageUrl(imageName);
         const preload = new Promise((resolve) => {
           image.onload = function () {
             resolve(true);
@@ -65,12 +55,12 @@
         });
 
         image.src = imageUrl;
-        archiveImageCache.set(imageName, preload);
+        archiveImageCache.set(imageUrl, preload);
         return preload;
       }
 
       function preloadArchiveProjectImages(project) {
-        project.images.forEach(preloadArchiveImage);
+        project.images.forEach((imageName) => preloadArchiveImage(imageName, project.title));
       }
 
       function stopArchiveSlideshow() {
@@ -103,7 +93,7 @@
 
         images.forEach((image, slotIndex) => {
           const slotImageIndex = imageIndexes[slotIndex] ?? imageIndex;
-          const imageUrl = getArchiveImageUrl(project.images[slotImageIndex]);
+          const imageUrl = getArchiveImageUrl(project.images[slotImageIndex], project.title);
           image.src = imageUrl;
           image.alt = `${project.title} preview ${slotImageIndex + 1}`;
           image.dataset.fullImage = imageUrl;
@@ -127,7 +117,7 @@
           const currentImageIndex = Number(item.dataset.archiveImageIndex || 0);
           const nextImageIndex = (currentImageIndex + 1) % project.images.length;
 
-          preloadArchiveImage(project.images[nextImageIndex]).then((loaded) => {
+          preloadArchiveImage(project.images[nextImageIndex], project.title).then((loaded) => {
             if (!loaded || currentOpenItem !== item || !item.classList.contains("is-open")) {
               return;
             }
@@ -320,7 +310,7 @@
               const mobileCarousel = document.createElement("div");
               mobileCarousel.className = "archive-mobile-carousel";
               const mobileCarouselAssets = project.images.map((imageName, imageIndex) => ({
-                url: getArchiveImageUrl(imageName),
+                url: getArchiveImageUrl(imageName, project.title),
                 alt: `${project.title} preview ${imageIndex + 1}`
               }));
               const minimumMobileSlides = 3;
