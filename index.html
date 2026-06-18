@@ -222,21 +222,26 @@
         window.projectUtils.validateProjectData();
 
         const featuredProjects = window.projectUtils.getFeaturedProjects();
+        const homeLoading = homeContainer.querySelector("[data-home-loading]");
         if (featuredProjects.length > homeSlots.length) {
           console.error(`Too many featured projects: ${featuredProjects.length}. Only ${homeSlots.length} home slots are available.`);
         }
 
-        featuredProjects
-          .slice(0, homeSlots.length)
-          .forEach((project, projectIndex) => {
-            const homeSlot = homeSlots[projectIndex];
-            const title = document.createElement("div");
-            title.className = "cella tit";
-            title.id = homeSlot;
-            title.dataset.project = project.slug;
-            title.textContent = project.title;
-            homeContainer.insertBefore(title, document.getElementById("k12"));
-          });
+        const projectsToRender = featuredProjects.slice(0, homeSlots.length);
+
+        projectsToRender.forEach((project, projectIndex) => {
+          const homeSlot = homeSlots[projectIndex];
+          const title = document.createElement("div");
+          title.className = "cella tit";
+          title.id = homeSlot;
+          title.dataset.project = project.slug;
+          title.textContent = project.title;
+          homeContainer.insertBefore(title, document.getElementById("k12"));
+        });
+
+        if (homeLoading) {
+          homeLoading.remove();
+        }
       }
 
       function fitHomeTitles() {
@@ -506,6 +511,7 @@
     <div class="cella" id="a1"><a href="index.html">GIACOMO ALBANI</a></div>
     <div class="cella" id="a4"><a class="active-page-link" href="index.html" aria-current="page">PORTFOLIO</a></div>
     <div class="cella" id="a5"><span class="version-control version-label"><button class="version-button" type="button"></button><span class="version-date" aria-hidden="true"></span><span class="version-burst" aria-hidden="true"></span></span><a class="mobile-archive-link" href="archive.html">ARCHIVE</a></div>
+    <div class="cella home-loading" id="d1" data-home-loading>LOADING</div>
     <div class="cella" id="k12"><a href="https://www.behance.net/giaaaacomo" target="_blank" rel="noreferrer">BEHANCE</a></div>
     <div class="cella" id="k45"><a href="info.html">INFO</a></div>
     <div class="cella" id="k5"><a href="archive.html">ARCHIVE</a></div>

@@ -123,6 +123,12 @@ p {
   text-shadow: var(--marker-glow);
 }
 
+.home-loading {
+  grid-column: 1 / 3;
+  grid-row: 4;
+  opacity: var(--muted-opacity);
+}
+
 #a1 {
   grid-column: 1;
   grid-row: 1;
