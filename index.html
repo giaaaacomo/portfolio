@@ -437,6 +437,13 @@
       renderHomeProjects();
       requestHomeTitleFit();
 
+      const projectFromHash = decodeURIComponent(window.location.hash.slice(1));
+if (projectFromHash) {
+  const target = [...document.querySelectorAll(".tit[data-project]")]
+    .find(el => el.dataset.project === projectFromHash);
+  if (target) openProject(target);
+}
+
       if (document.fonts) {
         document.fonts.ready.then(requestHomeTitleFit);
       }

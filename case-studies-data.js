@@ -160,7 +160,7 @@ Rather than designing a separate experience for each device, ChroNotes was struc
               wide: true,
               src: "chronotes-case/ui-flowchart-notes.webp",
               alt: "ChroNotes overview diagram showing image notes, warning notes, and stacked notes connected in a shared knowledge flow",
-              caption: "Overview of the note system: single notes, warning states, image notes, and stacks are connected as parts of the same knowledge structure."
+              caption: "Overview of the note system: single notes, warning states, image notes, are connected as parts of the same knowledge structure."
             }
           ],
           body: `Notes are the atomic unit of ChroNotes: each one packages a single piece of operational knowledge while keeping its status, source, and temporal position visible. This follows a cognitive-fit logic, shaping information so that its visual form matches the task the user has to perform and reducing the translation effort between reading, choosing, and acting.
