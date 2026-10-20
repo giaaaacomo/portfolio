@@ -570,6 +570,7 @@
     }
 
     renderDocument(root, caseStudy, project, options);
+    window.portfolioAnalytics?.track("case-study-open", slug);
     return true;
   }
 
