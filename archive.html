@@ -16,6 +16,7 @@
   </style>
   <script src="projects-data.js"></script>
   <script src="site-meta.js"></script>
+  <script src="portfolio-analytics.js" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const archiveProjects = Object.fromEntries(window.projectsData.map((project) => [project.slug, project]));
@@ -152,6 +153,7 @@
             title.setAttribute("aria-expanded", "true");
           }
           startArchiveSlideshow(item, selectedProject);
+          window.portfolioAnalytics?.track("archive-project-open", selectedProject.slug);
         }
       }
 

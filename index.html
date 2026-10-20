@@ -26,6 +26,7 @@
   <script src="case-studies-data.js"></script>
   <script src="case-study-renderer.js"></script>
   <script src="site-meta.js"></script>
+  <script src="portfolio-analytics.js" defer></script>
   <script>
   
 
@@ -383,6 +384,7 @@
         fileContainer.classList.remove("is-case-study");
         inlineCaseStudyRoot.innerHTML = "";
         currentProject = project;
+        window.portfolioAnalytics?.track("project-open", project.slug);
         currentImageIndex = 0;
         const requestId = slideshowRequestId + 1;
         slideshowRequestId = requestId;
