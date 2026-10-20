@@ -1,18 +1,16 @@
-/* GoatCounter analytics for the portfolio.
- * Leave SITE_CODE empty until a GoatCounter site has been registered.
- * Only aggregate pageviews and a small set of intentional interactions are sent.
- * GoatCounter creates campaigns automatically when incoming links contain utm_campaign.
+/* Privacy-oriented aggregate analytics for the portfolio.
+ * GoatCounter recognizes utm_campaign/utm_source automatically from incoming URLs.
+ * Do not send names, email addresses, full outgoing URLs, or other personal data in events.
  */
 (function () {
   "use strict";
 
-  const SITE_CODE = ""; // Example: "my-portfolio" from my-portfolio.goatcounter.com
+  const SITE_CODE = "giaaaacomo";
   const allowedEvents = new Set(["project-open", "archive-project-open", "case-study-open"]);
   const pendingEvents = [];
   let ready = false;
 
   function record(path, title) {
-    if (!SITE_CODE) return;
     if (!ready || !window.goatcounter || typeof window.goatcounter.count !== "function") {
       if (pendingEvents.length < 50) pendingEvents.push({ path, title });
       return;
@@ -22,62 +20,67 @@
 
   function track(type, slug) {
     if (!allowedEvents.has(type) || typeof slug !== "string") return;
-    // Project slugs are site-controlled. Never send arbitrary URL parameters or user input.
-    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 90);
-    if (!cleanSlug) return;
-    record(type + "-" + cleanSlug, type.replace(/-/g, " ") + ": " + cleanSlug);
+    // Project/case-study slugs are defined in this repository, never supplied by visitors.
+    const safeSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 90);
+    if (!safeSlug) return;
+    record(type + "-" + safeSlug, type.replace(/-/g, " ") + ": " + safeSlug);
   }
 
-  // Available from the existing project-open and case-study rendering functions.
   window.portfolioAnalytics = Object.freeze({ track });
 
-  // Until registration is complete this file is inert: no remote script or network call.
-  if (!SITE_CODE || !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(SITE_CODE)) return;
+  // Respect explicit browser privacy preferences. GoatCounter otherwise ignores DNT.
+  if (navigator.globalPrivacyControl === true || navigator.doNotTrack === "1") return;
 
-  function canonicalPath() {
+  function pagePath() {
     const path = window.location.pathname || "/";
     if (!path.endsWith("/case-study.html")) return path;
 
-    // Keep the *project* parameter for distinct case-study pageviews.
-    // Never forward other arbitrary query parameters as part of the page name.
+    // Preserve only the known case-study identifier in page metrics.
+    // Campaign parameters stay in the landing URL for GoatCounter's campaign parser.
     const slug = new URLSearchParams(window.location.search).get("project");
-    if (slug && window.caseStudiesData && Object.prototype.hasOwnProperty.call(window.caseStudiesData, slug)) {
+    if (slug && window.caseStudiesData &&
+        Object.prototype.hasOwnProperty.call(window.caseStudiesData, slug)) {
       return path + "?project=" + encodeURIComponent(slug);
     }
     return path;
   }
 
-  function classifyLink(anchor) {
-    const rawHref = anchor.getAttribute("href") || "";
-    if (!rawHref || rawHref.startsWith("#")) return null;
-    if (rawHref.startsWith("mailto:")) return "click-email";
+  function linkCategory(anchor) {
+    const raw = anchor.getAttribute("href") || "";
+    if (!raw || raw.startsWith("#")) return null;
+    if (raw.toLowerCase().startsWith("mailto:")) return "click-email";
 
     let url;
     try {
-      url = new URL(rawHref, window.location.href);
+      url = new URL(raw, window.location.href);
     } catch (_) {
       return null;
     }
-    if (url.pathname.toLowerCase().match(/\\/cv(?:[-_][^/]*)?\\.pdf$/)) return "click-cv";
-    if (url.origin === window.location.origin) return null;
-    if (!["https:", "http:"].includes(url.protocol)) return null;
 
-    const hostname = url.hostname.toLowerCase().replace(/^www\\./, "");
-    if (hostname === "behance.net") return "click-behance";
-    if (hostname === "orcid.org") return "click-orcid";
-    if (hostname === "github.com") return "click-github";
+    // Count clicks on the actual CV file, not other PDFs or internal links.
+    const filename = url.pathname.split("/").pop().toLowerCase();
+    if (filename.startsWith("cv") && filename.endsWith(".pdf")) return "click-cv";
+    if (url.origin === window.location.origin || !["https:", "http:"].includes(url.protocol)) {
+      return null;
+    }
+
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host === "behance.net") return "click-behance";
+    if (host === "orcid.org") return "click-orcid";
+    if (host === "github.com") return "click-github";
     return "click-external";
   }
 
+  // Event delegation also covers dynamically generated links and project content.
   document.addEventListener("click", function (event) {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const anchor = target.closest("a[href]");
+    if (!(event.target instanceof Element)) return;
+    const anchor = event.target.closest("a[href]");
     if (!anchor) return;
-    const category = classifyLink(anchor);
+    const category = linkCategory(anchor);
     if (category) record(category, category.replace(/-/g, " "));
   }, { capture: true });
 
+  // One manual pageview avoids duplicate requests and uses clean paths even with UTM tags.
   const script = document.createElement("script");
   script.async = true;
   script.src = "https://gc.zgo.at/count.js";
@@ -86,8 +89,7 @@
   script.addEventListener("load", function () {
     if (!window.goatcounter || typeof window.goatcounter.count !== "function") return;
     ready = true;
-    // Explicit pageview: count.js is loaded with no_onload to avoid double-counting.
-    window.goatcounter.count({ path: canonicalPath() });
+    window.goatcounter.count({ path: pagePath() });
     pendingEvents.splice(0).forEach(function (item) {
       record(item.path, item.title);
     });
